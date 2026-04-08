@@ -59,6 +59,7 @@ editor:
     1. None
     2. PyCharm_
     3. `VS Code`_
+    4. Neovim_
 
 use_docker:
     Indicates whether the project should be configured to use Docker_, `Docker Compose`_ and `devcontainer`_.
@@ -156,6 +157,7 @@ debug:
 
 .. _PyCharm: https://www.jetbrains.com/pycharm/
 .. _VS Code: https://github.com/microsoft/vscode
+.. _Neovim: https://neovim.io/
 
 .. _Docker: https://github.com/docker/docker
 .. _Docker Compose: https://docs.docker.com/compose/

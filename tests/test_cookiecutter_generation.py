@@ -15,6 +15,7 @@ except (ImportError, ModuleNotFoundError):
 import yaml
 from binaryornot.check import is_binary
 from cookiecutter.exceptions import FailedHookException
+from cookiecutter.main import cookiecutter
 
 PATTERN = r"{{(\s?cookiecutter)[.](.*?)}}"
 RE_OBJ = re.compile(PATTERN)
@@ -60,6 +61,7 @@ SUPPORTED_COMBINATIONS = [
     {"editor": "None"},
     {"editor": "PyCharm"},
     {"editor": "VS Code"},
+    {"editor": "Neovim"},
     {"use_docker": "y"},
     {"use_docker": "n"},
     {"postgresql_version": "18"},
@@ -384,6 +386,7 @@ def test_error_if_incompatible(cookies, context, invalid_context):
         ("None", False),
         ("PyCharm", True),
         ("VS Code", False),
+        ("Neovim", False),
     ],
 )
 def test_pycharm_docs_removed(cookies, context, editor, pycharm_docs_exist):
@@ -393,6 +396,47 @@ def test_pycharm_docs_removed(cookies, context, editor, pycharm_docs_exist):
     index_rst = result.project_path / "docs" / "index.rst"
     has_pycharm_docs = "pycharm/configuration" in index_rst.read_text()
     assert has_pycharm_docs is pycharm_docs_exist
+
+
+@pytest.mark.parametrize(
+    ("editor", "vscode_customization_exists"),
+    [
+        ("None", False),
+        ("PyCharm", False),
+        ("VS Code", True),
+        ("Neovim", False),
+    ],
+)
+def test_vscode_devcontainer_customizations_removed(tmp_path, context, editor, vscode_customization_exists):
+    context.update({"editor": editor, "use_docker": "y"})
+    cookiecutters_dir = tmp_path / "cookiecutters"
+    replay_dir = tmp_path / "cookiecutter_replay"
+    cookiecutters_dir.mkdir()
+    replay_dir.mkdir()
+    config_file = tmp_path / "cookiecutter_config.yaml"
+    config_file.write_text(
+        yaml.safe_dump(
+            {
+                "cookiecutters_dir": str(cookiecutters_dir),
+                "replay_dir": str(replay_dir),
+            },
+        ),
+    )
+
+    project_path = Path(
+        cookiecutter(
+            ".",
+            no_input=True,
+            extra_context=context,
+            output_dir=str(tmp_path),
+            config_file=str(config_file),
+            accept_hooks=False,
+        ),
+    )
+
+    devcontainer_json = project_path / ".devcontainer" / "devcontainer.json"
+    has_vscode_customization = '"vscode"' in devcontainer_json.read_text()
+    assert has_vscode_customization is vscode_customization_exists
 
 
 def test_trim_domain_email(cookies, context):

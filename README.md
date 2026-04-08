@@ -126,7 +126,8 @@ Answer the prompts with your own desired [options](http://cookiecutter-django.re
     1 - None
     2 - PyCharm
     3 - VS Code
-    Choose from 1, 2, 3 [1]: 1
+    4 - Neovim
+    Choose from 1, 2, 3, 4 [1]: 1
     use_docker [n]: n
     Select postgresql_version:
     1 - 18
