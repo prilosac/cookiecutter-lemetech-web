@@ -1,9 +1,9 @@
 {
-  "project_name": "My Awesome Project",
+  "project_name": "Leme Tech Project",
   "project_slug": "{{ cookiecutter.project_name.lower()|replace(' ', '_')|replace('-', '_')|replace('.', '_')|trim() }}",
-  "description": "Behold My Awesome Project!",
-  "author_name": "Daniel Roy Greenfeld",
-  "domain_name": "example.com",
+  "description": "Leme Tech Project",
+  "author_name": "Lucas Teixeira",
+  "domain_name": "lemete.ch",
   "email": "{{ cookiecutter.author_name.lower() | trim() |replace(' ', '-') }}@{{ cookiecutter.domain_name.lower() | trim() }}",
   "version": "0.1.0",
   "open_source_license": [
@@ -16,13 +16,13 @@
   "username_type": ["username", "email"],
   "timezone": "UTC",
   "windows": "n",
-  "editor": ["None", "PyCharm", "VS Code", "Neovim"],
+  "editor": ["None", "Neovim", "VS Code", "PyCharm"],
   "use_docker": "n",
   "postgresql_version": ["18", "17", "16", "15", "14"],
   "cloud_provider": ["AWS", "GCP", "Azure", "None"],
   "mail_service": [
-    "Mailgun",
     "Amazon SES",
+    "Mailgun",
     "Mailjet",
     "Mandrill",
     "Postmark",
@@ -39,7 +39,7 @@
   "use_sentry": "n",
   "use_whitenoise": "n",
   "use_heroku": "n",
-  "ci_tool": ["None", "Travis", "Gitlab", "Github", "Drone"],
+  "ci_tool": ["None", "Github", "Travis", "Gitlab", "Drone"],
   "keep_local_envs_in_vcs": "y",
   "debug": "n"
 }

@@ -124,9 +124,9 @@ Answer the prompts with your own desired [options](http://cookiecutter-django.re
     windows [n]: n
     Select an editor to use. The choices are:
     1 - None
-    2 - PyCharm
+    2 - Neovim
     3 - VS Code
-    4 - Neovim
+    4 - PyCharm
     Choose from 1, 2, 3, 4 [1]: 1
     use_docker [n]: n
     Select postgresql_version:
@@ -142,8 +142,8 @@ Answer the prompts with your own desired [options](http://cookiecutter-django.re
     3 - None
     Choose from 1, 2, 3 [1]: 1
     Select mail_service:
-    1 - Mailgun
-    2 - Amazon SES
+    1 - Amazon SES
+    2 - Mailgun
     3 - Mailjet
     4 - Mandrill
     5 - Postmark
@@ -171,10 +171,11 @@ Answer the prompts with your own desired [options](http://cookiecutter-django.re
     use_heroku [n]: y
     Select ci_tool:
     1 - None
-    2 - Travis
-    3 - Gitlab
-    4 - Github
-    Choose from 1, 2, 3, 4 [1]: 4
+    2 - Github
+    3 - Travis
+    4 - Gitlab
+    5 - Drone
+    Choose from 1, 2, 3, 4, 5 [1]: 2
     keep_local_envs_in_vcs [y]: y
     debug [n]: n
 
