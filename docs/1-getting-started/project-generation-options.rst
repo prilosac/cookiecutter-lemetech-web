@@ -57,9 +57,9 @@ editor:
     Select an editor to use. The choices are:
 
     1. None
-    2. PyCharm_
+    2. Neovim_
     3. `VS Code`_
-    4. Neovim_
+    4. PyCharm_
 
 use_docker:
     Indicates whether the project should be configured to use Docker_, `Docker Compose`_ and `devcontainer`_.
@@ -86,8 +86,8 @@ cloud_provider:
 mail_service:
     Select an email service that Django-Anymail provides
 
-    1. Mailgun_
-    2. `Amazon SES`_
+    1. `Amazon SES`_
+    2. Mailgun_
     3. Mailjet_
     4. Mandrill_
     5. Postmark_
@@ -136,9 +136,9 @@ ci_tool:
     Select a CI tool for running tests. The choices are:
 
     1. None
-    2. `Travis CI`_
-    3. `Gitlab CI`_
-    4. `Github Actions`_
+    2. `GitHub Actions`_
+    3. `Travis CI`_
+    4. `Gitlab CI`_
     5. `Drone CI`_
 
 keep_local_envs_in_vcs:
@@ -203,4 +203,4 @@ debug:
 
 .. _Drone CI: https://docs.drone.io/pipeline/overview/
 
-.. _Github Actions: https://docs.github.com/en/actions
+.. _GitHub Actions: https://docs.github.com/en/actions
