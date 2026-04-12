@@ -1,5 +1,5 @@
 [project]
-name = "cookiecutter-django"
+name = "cookiecutter-lemetech-web"
 version = "2026.04.03"
 description = "A Cookiecutter template for creating production-ready Django projects quickly."
 readme = "README.md"
@@ -12,7 +12,7 @@ keywords = [
 ]
 license = { text = "BSD" }
 authors = [
-  { name = "Daniel Roy Greenfeld", email = "pydanny@gmail.com" },
+  { name = "Lucas Teixeira", email = "prilosac@gmail.com" },
 ]
 requires-python = "==3.14.*"
 classifiers = [
@@ -48,7 +48,7 @@ dependencies = [
   "tox==4.52.0",
   "tox-uv>=1.17",
 ]
-urls = { Repository = "https://github.com/cookiecutter/cookiecutter-django" }
+urls = { Repository = "https://github.com/prilosac/cookiecutter-lemetech-web" }
 
 [dependency-groups]
 docs = [

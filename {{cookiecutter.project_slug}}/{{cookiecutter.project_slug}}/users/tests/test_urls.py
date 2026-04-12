@@ -1,3 +1,6 @@
+{%- if cookiecutter.frontend_pipeline == 'Vite' %}
+"""User-facing URL tests are not generated for Vite projects."""
+{%- else %}
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -30,3 +33,4 @@ def test_update():
 def test_redirect():
     assert reverse("users:redirect") == "/users/~redirect/"
     assert resolve("/users/~redirect/").view_name == "users:redirect"
+{%- endif %}

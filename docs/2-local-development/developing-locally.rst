@@ -71,7 +71,7 @@ Make sure to have the following on your host:
 
     uv run uvicorn config.asgi:application --host 0.0.0.0 --reload --reload-include '*.html'
 
-   If you've opted for Webpack or Gulp as frontend pipeline, please see the :ref:`dedicated section <bare-metal-webpack-gulp>` below.
+   If you've opted for Vite, Webpack, or Gulp as frontend pipeline, please see the dedicated section below.
 
 .. _PostgreSQL: https://www.postgresql.org/download/
 .. _Redis: https://redis.io/download
@@ -211,6 +211,27 @@ You can also use Django admin to queue up tasks, thanks to the `django-celerybea
 .. _django-celerybeat: https://django-celery-beat.readthedocs.io/en/latest/
 
 
+Using Vite
+----------
+
+If you've opted for ``Vite`` as front-end pipeline, Django and the frontend run as two local processes:
+
+#. Start Django on port ``8000`` using the commands above.
+
+#. Install the frontend dependencies from the generated ``frontend/`` directory::
+
+    cd frontend
+    npm install
+
+#. Start the Vite dev server::
+
+    npm run dev
+
+#. Access the application at ``http://localhost:5173``.
+
+The Vite dev server proxies backend requests to Django, including ``/api``, ``/admin``, ``/static``, ``/media``, and ``/__debug__/``.
+
+
 .. _bare-metal-webpack-gulp:
 
 Using Webpack or Gulp
@@ -241,4 +262,4 @@ If you've opted for Gulp or Webpack as front-end pipeline, the project comes con
 Summary
 -------
 
-Congratulations, you have made it! Keep on reading to unleash full potential of Cookiecutter Django.
+Congratulations, you have made it! Keep on reading to unleash full potential of Cookiecutter Leme Tech Web.

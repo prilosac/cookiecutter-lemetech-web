@@ -1,3 +1,30 @@
+{% if cookiecutter.frontend_pipeline == 'Vite' %}
+{% raw %}<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <title>{% endraw %}{{ cookiecutter.project_name }}{% raw %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="{% endraw %}{{ cookiecutter.description }}{% raw %}" />
+  </head>
+  <body class="{% block bodyclass %}{% endblock bodyclass %}">
+    <main>
+      {% if messages %}
+        {% for message in messages %}
+          <div>{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+      {% block main %}
+        {% block content %}{% endblock content %}
+      {% endblock main %}
+    </main>
+    {% block modal %}{% endblock modal %}
+    {% block inline_javascript %}{% endblock inline_javascript %}
+  </body>
+</html>
+{% endraw %}
+{% else %}
 {% raw %}
 {% load static i18n {% endraw %}
 
@@ -197,3 +224,4 @@
 </body>
 </html>
 {%- endraw %}
+{% endif %}

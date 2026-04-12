@@ -1,4 +1,4 @@
-# this is a very simple script that tests the generation for cookiecutter-django with Windows
+# this is a very simple script that tests the generation for cookiecutter-lemetech-web with Windows
 # it is meant to be run from the root directory of the repository, eg: powershell tests/test_generate.ps1
 
 $ErrorActionPreference = "Stop"

@@ -117,6 +117,8 @@ SUPPORTED_COMBINATIONS = [
     {"use_async": "y"},
     {"use_async": "n"},
     {"frontend_pipeline": "None"},
+    {"frontend_pipeline": "Vite", "rest_api": "DRF"},
+    {"frontend_pipeline": "Vite", "rest_api": "Django Ninja"},
     {"frontend_pipeline": "Django Compressor"},
     {"frontend_pipeline": "Gulp"},
     {"frontend_pipeline": "Webpack"},
@@ -146,6 +148,8 @@ UNSUPPORTED_COMBINATIONS = [
     {"cloud_provider": "GCP", "mail_service": "Amazon SES"},
     {"cloud_provider": "Azure", "mail_service": "Amazon SES"},
     {"cloud_provider": "None", "mail_service": "Amazon SES"},
+    {"frontend_pipeline": "Vite"},
+    {"frontend_pipeline": "Vite", "rest_api": "None"},
 ]
 
 

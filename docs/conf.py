@@ -1,4 +1,4 @@
-# cookiecutter-django documentation build configuration file.
+# cookiecutter-lemetech-web documentation build configuration file.
 #
 # This file is execfile()d with the current directory set to its containing dir.
 #
@@ -41,8 +41,8 @@ source_suffix = {
 master_doc = "index"
 
 # General information about the project.
-project = "Cookiecutter Django"
-copyright = f"2013-{now.year}, Daniel Roy Greenfeld"
+project = "Cookiecutter Leme Tech Web"
+copyright = f"2026-{now.year}, Lucas Teixeira"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -165,7 +165,7 @@ html_static_path = ["_static"]
 # html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = "cookiecutter-djangodoc"
+htmlhelp_basename = "cookiecutter-lemetech-webdoc"
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -184,9 +184,9 @@ latex_elements = {
 latex_documents = [
     (
         "index",
-        "cookiecutter-django.tex",
-        "cookiecutter-django Documentation",
-        "cookiecutter-django",
+        "cookiecutter-lemetech-web.tex",
+        "cookiecutter-lemetech-web Documentation",
+        "cookiecutter-lemetech-web",
         "manual",
     ),
 ]
@@ -219,9 +219,9 @@ latex_documents = [
 man_pages = [
     (
         "index",
-        "Cookiecutter Django",
-        "Cookiecutter Django documentation",
-        ["Daniel Roy Greenfeld"],
+        "Cookiecutter Leme Tech Web",
+        "Cookiecutter Leme Tech Web documentation",
+        ["Lucas Teixeira"],
         1,
     ),
 ]
@@ -238,10 +238,10 @@ man_pages = [
 texinfo_documents = [
     (
         "index",
-        "Cookiecutter Django",
-        "Cookiecutter Django documentation",
-        "Daniel Roy Greenfeld",
-        "Cookiecutter Django",
+        "Cookiecutter Leme Tech Web",
+        "Cookiecutter Leme Tech Web documentation",
+        "Lucas Teixeira",
+        "Cookiecutter Leme Tech Web",
         "A Cookiecutter template for creating production-ready Django projects quickly.",
         "Miscellaneous",
     )

@@ -105,19 +105,17 @@ Or add the DSN for your account, if you already have one:
 .. _Sentry add-on: https://elements.heroku.com/addons/sentry
 
 
-Gulp or Webpack
-+++++++++++++++
+Vite, Gulp, or Webpack
+++++++++++++++++++++++
 
-If you've opted for Gulp or Webpack as frontend pipeline, you'll most likely need to setup
+If you've opted for Vite, Gulp, or Webpack as frontend pipeline, you'll most likely need to setup
 your app to use `multiple buildpacks`_: one for Python & one for Node.js:
 
 .. code-block:: bash
 
     heroku buildpacks:add --index 1 heroku/nodejs
 
-At time of writing, this should do the trick: during deployment,
-the Heroku should run ``npm install`` and then ``npm build``,
-which run the SASS compilation & JS bundling.
+At time of writing, this should do the trick. For Vite projects, make sure your Heroku build process installs dependencies and runs the frontend build from ``frontend/``. For Gulp and Webpack, Heroku should run ``npm install`` and then ``npm build`` from the project root.
 
 If things don't work, please refer to the Heroku docs.
 

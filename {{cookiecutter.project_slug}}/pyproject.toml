@@ -104,6 +104,8 @@ python_files = [
 ]
 {%- if cookiecutter.frontend_pipeline == 'Gulp' %}
 norecursedirs = [ "node_modules" ]
+{%- elif cookiecutter.frontend_pipeline == 'Vite' %}
+norecursedirs = [ "frontend/node_modules" ]
 {%- endif %}
 
 # ==== Coverage ====
