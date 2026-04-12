@@ -4,6 +4,9 @@ from .base import MIDDLEWARE
 {%- if cookiecutter.frontend_pipeline == 'Webpack' %}
 from .base import WEBPACK_LOADER
 {%- endif %}
+{%- if cookiecutter.frontend_pipeline == 'Vite' %}
+from .base import VITE_DEV_SERVER_URL
+{%- endif %}
 from .base import env
 
 # GENERAL
@@ -74,13 +77,16 @@ DEBUG_TOOLBAR_CONFIG = {
 }
 # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#internal-ips
 INTERNAL_IPS = ["127.0.0.1", "10.0.2.2"]
+{%- if cookiecutter.frontend_pipeline == 'Vite' %}
+CSRF_TRUSTED_ORIGINS = [VITE_DEV_SERVER_URL, "http://127.0.0.1:5173"]
+{%- endif %}
 {% if cookiecutter.use_docker == 'y' -%}
 if env("USE_DOCKER") == "yes":
     import socket
 
     hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
     INTERNAL_IPS += [".".join([*ip.split(".")[:-1], "1"]) for ip in ips]
-    {%- if cookiecutter.frontend_pipeline in ['Gulp', 'Webpack'] %}
+    {%- if cookiecutter.frontend_pipeline in ['Gulp', 'Webpack', 'Vite'] %}
     try:
         _, _, ips = socket.gethostbyname_ex("node")
         INTERNAL_IPS.extend(ips)

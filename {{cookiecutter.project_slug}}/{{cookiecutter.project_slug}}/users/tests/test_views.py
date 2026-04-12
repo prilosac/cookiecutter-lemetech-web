@@ -1,3 +1,6 @@
+{%- if cookiecutter.frontend_pipeline == 'Vite' %}
+"""User-facing view tests are not generated for Vite projects."""
+{%- else %}
 from __future__ import annotations
 
 from http import HTTPStatus
@@ -125,3 +128,4 @@ class TestUserDetailView:
         assert isinstance(response, HttpResponseRedirect)
         assert response.status_code == HTTPStatus.FOUND
         assert response.url == f"{login_url}?next=/fake-url/"
+{%- endif %}

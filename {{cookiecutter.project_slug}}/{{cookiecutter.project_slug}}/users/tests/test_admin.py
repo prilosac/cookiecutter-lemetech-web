@@ -1,3 +1,4 @@
+{%- if cookiecutter.frontend_pipeline != 'Vite' %}
 import contextlib
 from http import HTTPStatus
 from importlib import reload
@@ -7,6 +8,11 @@ from django.contrib import admin
 from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects
+{%- else %}
+from http import HTTPStatus
+
+from django.urls import reverse
+{%- endif %}
 
 from {{ cookiecutter.project_slug }}.users.models import User
 
@@ -56,6 +62,7 @@ class TestUserAdmin:
         response = admin_client.get(url)
         assert response.status_code == HTTPStatus.OK
 
+    {%- if cookiecutter.frontend_pipeline != 'Vite' %}
     @pytest.fixture
     def _force_allauth(self, settings):
         settings.DJANGO_ADMIN_FORCE_ALLAUTH = True
@@ -75,3 +82,4 @@ class TestUserAdmin:
         # The `admin` login view should redirect to the `allauth` login view
         target_url = reverse(settings.LOGIN_URL) + "?next=" + request.path
         assertRedirects(response, target_url, fetch_redirect_response=False)
+    {%- endif %}

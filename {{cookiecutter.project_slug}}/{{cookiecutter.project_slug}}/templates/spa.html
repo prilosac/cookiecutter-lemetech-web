@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <title>{{ cookiecutter.project_name }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="{{ cookiecutter.description }}" />
+    <style>
+      .spa-build-message {
+        font-family: system-ui, sans-serif;
+        line-height: 1.5;
+        margin: 2rem auto;
+        max-width: 42rem;
+        padding: 0 1rem;
+      }
+
+      .spa-build-title {
+        font-size: 1.5rem;
+        margin-bottom: 0.75rem;
+      }
+    </style>
+    {% raw %}
+    {% for css_url in vite_css_urls %}
+      <link rel="stylesheet" href="{{ css_url }}" />
+    {% endfor %}
+    {% if vite_js_url %}
+      <script type="module" src="{{ vite_js_url }}"></script>
+    {% endif %}
+  </head>
+  <body>
+    <div id="root"></div>
+    {% if vite_missing_build %}
+      <main class="spa-build-message">
+        <h1 class="spa-build-title">Frontend build not found</h1>
+        <p>
+          Django serves built SPA assets in Vite mode. For local frontend work, use the Vite dev server at
+          <code>{{ vite_dev_server_url }}</code>. To have Django serve the SPA shell directly, build the frontend first.
+        </p>
+      </main>
+    {% endif %}
+  </body>
+</html>
+{% endraw %}

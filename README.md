@@ -1,4 +1,4 @@
-# Cookiecutter Django
+# Cookiecutter Leme Tech Web
 
 [![Build Status](https://img.shields.io/github/actions/workflow/status/cookiecutter/cookiecutter-django/ci.yml?branch=main)](https://github.com/cookiecutter/cookiecutter-django/actions/workflows/ci.yml?query=branch%3Amain)
 [![Documentation Status](https://readthedocs.org/projects/cookiecutter-django/badge/?version=latest)](https://cookiecutter-django.readthedocs.io/en/latest/?badge=latest)
@@ -6,10 +6,9 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
 [![Updates](https://pyup.io/repos/github/cookiecutter/cookiecutter-django/shield.svg)](https://pyup.io/repos/github/cookiecutter/cookiecutter-django/)
-[![Join our Discord](https://img.shields.io/badge/Discord-cookiecutter-5865F2?style=flat&logo=discord&logoColor=white)](https://discord.gg/rAWFUP47d2)
 [![Code Helpers Badge](https://www.codetriage.com/cookiecutter/cookiecutter-django/badges/users.svg)](https://www.codetriage.com/cookiecutter/cookiecutter-django)
 
-Powered by [Cookiecutter](https://github.com/cookiecutter/cookiecutter), Cookiecutter Django is a framework for jumpstarting
+Powered by [Cookiecutter](https://github.com/cookiecutter/cookiecutter), Cookiecutter Leme Tech Web is a framework for jumpstarting
 production-ready Django projects quickly.
 
 - Documentation: <https://cookiecutter-django.readthedocs.io/en/latest/>
@@ -29,7 +28,7 @@ production-ready Django projects quickly.
 - Registration via [django-allauth](https://github.com/pennersr/django-allauth)
 - Comes with custom user model ready to go
 - Optional basic ASGI setup for Websockets
-- Optional custom static build using Gulp or Webpack
+- Optional frontend pipelines including Vite, Gulp, and Webpack
 - Send emails via [Anymail](https://github.com/anymail/django-anymail) (using [Mailgun](http://www.mailgun.com/) by default or Amazon SES if AWS is selected cloud provider, but switchable)
 - Media storage using Amazon S3, Google Cloud Storage, Azure Storage or nginx
 - Docker support using [docker-compose](https://github.com/docker/compose) for development and production (using [Traefik](https://traefik.io/) with [LetsEncrypt](https://letsencrypt.org/) support)
@@ -54,29 +53,6 @@ _These features can be enabled during initial project setup._
 - Uses PostgreSQL everywhere: 14 - 18 ([MySQL fork](https://github.com/mabdullahadeel/cookiecutter-django-mysql) also available).
 - Environment variables for configuration (This won't work with Apache/mod_wsgi).
 
-## Support this Project!
-
-This project is an open source project run by volunteers. You can sponsor us via [OpenCollective](https://opencollective.com/cookiecutter-django) or individually via GitHub Sponsors:
-
-- Daniel Roy Greenfeld, Project Lead ([GitHub](https://github.com/pydanny), [Patreon](https://www.patreon.com/danielroygreenfeld)): expertise in Django and AWS ELB.
-- Fabio C. Barrionuevo, Core Developer ([GitHub](https://github.com/luzfcb)): expertise in Python/Django, hands-on DevOps and frontend experience.
-- Bruno Alla, Core Developer ([GitHub](https://github.com/browniebroke)): expertise in Python/Django and DevOps.
-- Nikita Shupeyko, Core Developer ([GitHub](https://github.com/webyneter)): expertise in Python/Django, hands-on DevOps and frontend experience.
-
-Projects that provide financial support to the maintainers:
-
-### Two Scoops of Django
-
-[![Cover of the book "Two Scoops of Django 3.x"](https://f004.backblazeb2.com/file/feldroycom/images/book-TSD3-800.jpg)](https://www.feldroy.com/two-scoops-of-django)
-
-Two Scoops of Django 3.x is the best ice cream-themed Django reference in the universe!
-
-### PyUp
-
-[![PyUp Logo](https://pyup.io/static/images/logo.png)](https://pyup.io)
-
-PyUp brings you automated security and dependency updates used by Google and other organizations. Free for open source projects!
-
 ## Usage
 
 Let's pretend you want to create a Django project called "redditclone". Rather than using `startproject`
@@ -92,92 +68,95 @@ Now run it against this repo:
 
 You'll be prompted for some values. Provide them, then a Django project will be created for you.
 
-**Warning**: After this point, change 'Daniel Greenfeld', 'pydanny', etc to your own information.
+**Warning**: After this point, change 'Lucas Teixeira', 'prilosac', etc to your own information.
 
 Answer the prompts with your own desired [options](http://cookiecutter-django.readthedocs.io/en/latest/1-getting-started/project-generation-options.html). For example:
 
-    Cloning into 'cookiecutter-django'...
+    Cloning into 'cookiecutter-lemetech-web'...
     remote: Counting objects: 550, done.
     remote: Compressing objects: 100% (310/310), done.
     remote: Total 550 (delta 283), reused 479 (delta 222)
     Receiving objects: 100% (550/550), 127.66 KiB | 58 KiB/s, done.
     Resolving deltas: 100% (283/283), done.
-    project_name [My Awesome Project]: Reddit Clone
-    project_slug [reddit_clone]: reddit
-    description [Behold My Awesome Project!]: A reddit clone.
-    author_name [Daniel Roy Greenfeld]: Daniel Greenfeld
-    domain_name [example.com]: myreddit.com
-    email [daniel-greenfeld@example.com]: pydanny@gmail.com
-    version [0.1.0]: 0.0.1
-    Select open_source_license:
-    1 - MIT
-    2 - BSD
-    3 - GPLv3
-    4 - Apache Software License 2.0
-    5 - Not open source
-    Choose from 1, 2, 3, 4, 5 [1]: 1
-    Select username_type:
-    1 - username
-    2 - email
-    Choose from 1, 2 [1]: 1
-    timezone [UTC]: America/Los_Angeles
-    windows [n]: n
-    Select an editor to use. The choices are:
-    1 - None
-    2 - Neovim
-    3 - VS Code
-    4 - PyCharm
-    Choose from 1, 2, 3, 4 [1]: 1
-    use_docker [n]: n
-    Select postgresql_version:
-    1 - 18
-    2 - 17
-    3 - 16
-    4 - 15
-    5 - 14
-    Choose from 1, 2, 3, 4 [1]: 1
-    Select cloud_provider:
-    1 - AWS
-    2 - GCP
-    3 - None
-    Choose from 1, 2, 3 [1]: 1
-    Select mail_service:
-    1 - Amazon SES
-    2 - Mailgun
-    3 - Mailjet
-    4 - Mandrill
-    5 - Postmark
-    6 - Sendgrid
-    7 - Brevo (formerly SendinBlue)
-    8 - SparkPost
-    9 - Other SMTP
-    Choose from 1, 2, 3, 4, 5, 6, 7, 8, 9 [1]: 1
-    Select rest_api [None]:
-    1 - None
-    2 - DRF
-    3 - Django Ninja
-    Choose from 1, 2, 3 [1]: 1
-    use_async [n]: n
-    Select frontend_pipeline:
-    1 - None
-    2 - Django Compressor
-    3 - Gulp
-    4 - Webpack
-    Choose from 1, 2, 3, 4 [1]: 1
-    use_celery [n]: y
-    use_mailpit [n]: n
-    use_sentry [n]: y
-    use_whitenoise [n]: n
-    use_heroku [n]: y
-    Select ci_tool:
-    1 - None
-    2 - Github
-    3 - Travis
-    4 - Gitlab
-    5 - Drone
-    Choose from 1, 2, 3, 4, 5 [1]: 2
-    keep_local_envs_in_vcs [y]: y
-    debug [n]: n
+    [1/27] project_name (Leme Tech Project):
+    [2/27] project_slug (leme_tech_project):
+    [3/27] description (Leme Tech Project):
+    [4/27] author_name (Lucas Teixeira):
+    [5/27] domain_name (lemete.ch):
+    [6/27] email (lucas-teixeira@lemete.ch):
+    [7/27] version (0.1.0):
+    [8/27] Select open_source_license
+      1 - MIT
+      2 - BSD
+      3 - GPLv3
+      4 - Apache Software License 2.0
+      5 - Not open source
+      Choose from [1/2/3/4/5] (1):
+    [9/27] Select username_type
+      1 - email
+      2 - username
+      Choose from [1/2] (1):
+    [10/27] timezone (UTC):
+    [11/27] windows (n):
+    [12/27] Select editor
+      1 - Neovim
+      2 - VS Code
+      3 - PyCharm
+      4 - None
+      Choose from [1/2/3/4] (1):
+    [13/27] use_docker (y):
+    [14/27] Select postgresql_version
+      1 - 18
+      2 - 17
+      3 - 16
+      4 - 15
+      5 - 14
+      Choose from [1/2/3/4/5] (1):
+    [15/27] Select cloud_provider
+      1 - AWS
+      2 - GCP
+      3 - Azure
+      4 - None
+      Choose from [1/2/3/4] (1):
+    [16/27] Select mail_service
+      1 - Amazon SES
+      2 - Mailgun
+      3 - Mailjet
+      4 - Mandrill
+      5 - Postmark
+      6 - Sendgrid
+      7 - Brevo
+      8 - SparkPost
+      9 - Other SMTP
+      Choose from [1/2/3/4/5/6/7/8/9] (1):
+    [17/27] Select rest_api
+      1 - DRF
+      2 - Django Ninja
+      3 - None
+      Choose from [1/2/3] (1):
+    [18/27] use_async (y):
+    [19/27] Select frontend_pipeline
+      1 - Vite
+      2 - Django Compressor
+      3 - Gulp
+      4 - Webpack
+      5 - None
+      Choose from [1/2/3/4/5] (1):
+    [20/27] use_celery (y):
+    [21/27] use_mailpit (y):
+    [22/27] use_sentry (y):
+    [23/27] use_whitenoise (y):
+    [24/27] use_heroku (n):
+    [25/27] Select ci_tool
+      1 - Github
+      2 - Travis
+      3 - Gitlab
+      4 - Drone
+      5 - None
+      Choose from [1/2/3/4/5] (1):
+    [26/27] keep_local_envs_in_vcs (y):
+    [27/27] debug (n):
+
 
 Enter the project and take a look around:
 
@@ -192,7 +171,7 @@ Create a git repo and push it there:
     git remote add origin git@github.com:pydanny/redditclone.git
     git push -u origin main
 
-Now take a look at your repo. Don't forget to carefully look at the generated README. Awesome, right?
+Now take a look at your repo. Don't forget to carefully look at the generated README. If you selected Vite, your React + TypeScript frontend will live in ``frontend/``. Awesome, right?
 
 For local development, see the following:
 
@@ -226,7 +205,7 @@ https://github.com/mabdullahadeel/cookiecutter-django-mysql
 
 ## Releases
 
-Need a stable release? You can find them at <https://github.com/cookiecutter/cookiecutter-django/releases>
+Need a stable release? You can find them at <https://github.com/prilosac/cookiecutter-lemetech-web/releases>
 
 ## Not Exactly What You Want?
 
@@ -235,18 +214,11 @@ This is what I want. _It might not be what you want._ Don't worry, you have opti
 ### Fork This
 
 If you have differences in your preferred setup, I encourage you to fork this to create your own version.
-Once you have your fork working, let me know and I'll add it to a '_Similar Cookiecutter Templates_' list here.
-It's up to you whether to rename your fork.
-
-If you do rename your fork, I encourage you to submit it to the following places:
-
-- [cookiecutter](https://github.com/cookiecutter/cookiecutter) so it gets listed in the README as a template.
-- The cookiecutter [grid](https://www.djangopackages.com/grids/g/cookiecutters/) on Django Packages.
 
 ### Submit a Pull Request
 
-We accept pull requests if they're small, atomic, and make our own project development
-experience better.
+We accept pull requests if they're small, atomic, 
+and make our own project development experience better.
 
 ## Articles
 

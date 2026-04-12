@@ -11,6 +11,7 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 # {{ cookiecutter.project_slug }}/
 APPS_DIR = BASE_DIR / "{{ cookiecutter.project_slug }}"
 env = environ.Env()
+FRONTEND_PIPELINE = "{{ cookiecutter.frontend_pipeline }}"
 
 READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=False)
 if READ_DOT_ENV_FILE:
@@ -126,9 +127,17 @@ AUTHENTICATION_BACKENDS = [
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-user-model
 AUTH_USER_MODEL = "users.User"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
+{%- if cookiecutter.frontend_pipeline == 'Vite' %}
+LOGIN_REDIRECT_URL = "home"
+{%- else %}
 LOGIN_REDIRECT_URL = "users:redirect"
+{%- endif %}
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-url
+{%- if cookiecutter.frontend_pipeline == 'Vite' %}
+LOGIN_URL = "home"
+{%- else %}
 LOGIN_URL = "account_login"
+{%- endif %}
 
 # PASSWORDS
 # ------------------------------------------------------------------------------
@@ -179,6 +188,14 @@ STATIC_ROOT = str(BASE_DIR / "staticfiles")
 STATIC_URL = "/static/"
 # https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
 STATICFILES_DIRS = [str(APPS_DIR / "static")]
+{%- if cookiecutter.frontend_pipeline == 'Vite' %}
+VITE_DEV_SERVER_URL = env("VITE_DEV_SERVER_URL", default="http://localhost:5173")
+VITE_MANIFEST_ENTRY = "index.html"
+VITE_MANIFEST_PATH = BASE_DIR / "frontend" / "dist" / "manifest.json"
+vite_dist_dir = VITE_MANIFEST_PATH.parent
+if vite_dist_dir.exists():
+    STATICFILES_DIRS.append(str(vite_dist_dir))
+{%- endif %}
 # https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
 STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",

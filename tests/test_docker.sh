@@ -1,5 +1,5 @@
 #!/bin/sh
-# this is a very simple script that tests the docker configuration for cookiecutter-django
+# this is a very simple script that tests the docker configuration for cookiecutter-lemetech-web
 # it is meant to be run from the root directory of the repository, eg:
 # sh tests/test_docker.sh
 
@@ -79,8 +79,11 @@ docker run --rm \
 -e MAILGUN_DOMAIN=x \
 django-prod python manage.py check --settings=config.settings.production --deploy --database default --fail-level WARNING
 
-# Run npm build script if package.json is present
-if [ -f "package.json" ]
+# Run npm build script if frontend/package.json or package.json is present
+if [ -f "frontend/package.json" ]
+then
+    docker compose -f docker-compose.local.yml run --rm node npm run build
+elif [ -f "package.json" ]
 then
     docker compose -f docker-compose.local.yml run --rm node npm run build
 fi

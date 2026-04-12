@@ -103,6 +103,8 @@ rest_api:
     2. `Django Rest Framework`_
     3. `Django Ninja`_
 
+    ``Vite`` requires either ``Django Rest Framework`` or ``Django Ninja``.
+
 use_async:
     Indicates whether the project should use web sockets with Uvicorn + Gunicorn.
 
@@ -110,9 +112,12 @@ frontend_pipeline:
     Select a pipeline to compile and optimise frontend assets (JS, CSS, ...):
 
     1. None
-    2. `Django Compressor`_
-    3. `Gulp`_
-    4. `Webpack`_
+    2. Vite
+    3. `Django Compressor`_
+    4. `Gulp`_
+    5. `Webpack`_
+
+    ``Vite`` generates a separate React + TypeScript frontend in ``frontend/`` with Tailwind CSS and TanStack Router.
 
 Both Gulp and Webpack support Bootstrap recompilation with real-time variables alteration.
 
@@ -147,7 +152,7 @@ Indicates whether the project’s .envs/.local/ should be kept in VCS (comes in 
 
 debug:
     Indicates whether the project should be configured for debugging.
-    This option is relevant for Cookiecutter Django developers only.
+    This option is relevant for Cookiecutter Leme Tech Web developers only.
 
 
 .. _MIT: https://opensource.org/licenses/MIT
