@@ -487,6 +487,47 @@ def test_pyproject_toml(cookies, context):
     assert data["project"]["name"] == context["project_slug"]
 
 
+def test_vite_headless_auth_contract(cookies, context):
+    context.update({"frontend_pipeline": "Vite", "rest_api": "DRF", "use_docker": "n"})
+    result = cookies.bake(extra_context=context)
+
+    assert result.exit_code == 0
+
+    base_settings = (result.project_path / "config" / "settings" / "base.py").read_text()
+    urls = (result.project_path / "config" / "urls.py").read_text()
+    auth_views = (result.project_path / "config" / "auth_views.py").read_text()
+    vite_config = (result.project_path / "frontend" / "vite.config.ts").read_text()
+    router = (result.project_path / "frontend" / "src" / "router.tsx").read_text()
+    admin_tests = (result.project_path / context["project_slug"] / "users" / "tests" / "test_admin.py").read_text()
+    generated_readme = (result.project_path / "README.md").read_text()
+
+    assert '"allauth.headless"' in base_settings
+    assert 'HEADLESS_CLIENTS = ("browser",)' in base_settings
+    assert "HEADLESS_ONLY = True" in base_settings
+    assert '"account_confirm_email": "/account/verify-email/{key}"' in base_settings
+    assert 'LOGIN_URL = "account_login"' in base_settings
+
+    assert 'path("accounts/bootstrap/", spa_auth_bootstrap_view, name="account_spa_bootstrap")' in urls
+    assert 'path("accounts/login/", account_login_redirect_view, name="account_login")' in urls
+    assert 'path("_allauth/", include("allauth.headless.urls"))' in urls
+    assert 'r"^(?!admin/|api/|accounts/|_allauth/|media/|static/|__debug__/).+$"' in urls
+
+    assert "class SPAAuthBootstrapView(View):" in auth_views
+    assert '"csrf_token": get_token(request)' in auth_views
+
+    assert "'/accounts': {" in vite_config
+    assert "'/_allauth': {" in vite_config
+
+    assert "path: '/account/login'" in router
+    assert "path: '/account/2fa'" in router
+    assert "path: '/account/provider/callback'" in router
+    assert "Client-side auth UI is intentionally left for a follow-up change." not in router
+
+    assert "def test_allauth_login" in admin_tests
+    assert "SPA auth surface backed by `allauth.headless`" in generated_readme
+    assert "intentionally left for a follow-up change" not in generated_readme
+
+
 def test_pre_commit_without_heroku(cookies, context):
     context.update({"use_heroku": "n"})
     result = cookies.bake(extra_context=context)

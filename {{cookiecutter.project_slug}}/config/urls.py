@@ -24,6 +24,9 @@ from rest_framework.authtoken.views import obtain_auth_token
 from .api import api
 {% endif -%}
 {% if cookiecutter.frontend_pipeline == 'Vite' -%}
+from .auth_views import account_login_redirect_view
+from .auth_views import account_signup_redirect_view
+from .auth_views import spa_auth_bootstrap_view
 from .views import SpaView
 {% endif -%}
 {% endif %}
@@ -40,6 +43,13 @@ urlpatterns = [
     {%- endif %}
     # Django Admin, use {% raw %}{% url 'admin:index' %}{% endraw %}
     path(settings.ADMIN_URL, admin.site.urls),
+    {%- if cookiecutter.frontend_pipeline == 'Vite' %}
+    path("accounts/bootstrap/", spa_auth_bootstrap_view, name="account_spa_bootstrap"),
+    path("accounts/login/", account_login_redirect_view, name="account_login"),
+    path("accounts/signup/", account_signup_redirect_view, name="account_signup"),
+    path("accounts/", include("allauth.urls")),
+    path("_allauth/", include("allauth.headless.urls")),
+    {%- endif %}
     {%- if cookiecutter.frontend_pipeline != 'Vite' %}
     # User management
     path("users/", include("{{ cookiecutter.project_slug }}.users.urls", namespace="users")),
@@ -110,7 +120,7 @@ if settings.DEBUG:
 {%- if cookiecutter.frontend_pipeline == 'Vite' %}
 urlpatterns += [
     re_path(
-        r"^(?!admin/|api/|media/|static/|__debug__/).+$",
+        r"^(?!admin/|api/|accounts/|_allauth/|media/|static/|__debug__/).+$",
         SpaView.as_view(),
         name="spa",
     ),

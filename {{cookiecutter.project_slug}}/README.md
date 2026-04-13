@@ -20,7 +20,11 @@ Moved to [settings](https://cookiecutter-django.readthedocs.io/en/latest/1-getti
 
 {%- if cookiecutter.frontend_pipeline == 'Vite' %}
 
-- Public auth pages are not mounted in Vite mode. The backend still includes `django-allauth`, but the SPA auth UX is intentionally left for a follow-up change.
+- Vite mode ships with a SPA auth surface backed by `allauth.headless`.
+
+- Route ownership is split deliberately: the SPA lives under `/account/...`, Django auth entrypoints stay under `/accounts/...`, and headless browser endpoints stay under `/_allauth/browser/v1/...`.
+
+- Visiting `/admin/` while logged out can still flow through `django-allauth` when `DJANGO_ADMIN_FORCE_ALLAUTH=True`. Django redirects to `account_login`, and the backend bridge sends the browser to the SPA login screen while preserving `next`.
 
 - To create a **superuser account**, use this command:
 
@@ -67,12 +71,24 @@ Install frontend dependencies and start the Vite dev server:
 
 Start Django separately on port `8000`, then use the frontend at `http://localhost:5173`.
 
+The Vite dev server proxies `/accounts`, `/_allauth`, `/api`, `/admin`, `/static`, and `/media` back to Django, so the SPA uses the same browser-session auth contract locally and in production.
+
+Key auth routes in the generated app:
+
+    /account/login
+    /account/signup
+    /account/logout
+    /account/verify-email/<key>
+    /account/password/reset
+    /account/password/reset/key/<key>
+    /account/provider/callback
+
 To create a production frontend build that Django can serve:
 
     cd frontend
     npm run build
 
-The generated frontend uses React, TypeScript, Tailwind CSS, and TanStack Router.
+The generated frontend uses React, TypeScript, Tailwind CSS, TanStack Router, and same-origin session auth through `django-allauth`.
 
 {%- else %}
 
