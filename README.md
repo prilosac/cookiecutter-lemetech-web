@@ -25,7 +25,7 @@ production-ready Django projects quickly.
 - [12-Factor](https://12factor.net) based settings via [django-environ](https://github.com/joke2k/django-environ)
 - Secure by default. We believe in SSL.
 - Optimized development and production settings
-- Registration via [django-allauth](https://github.com/pennersr/django-allauth)
+- Registration via [django-allauth](https://github.com/pennersr/django-allauth), including `allauth.headless`-backed SPA auth in Vite mode
 - Comes with custom user model ready to go
 - Optional basic ASGI setup for Websockets
 - Optional frontend pipelines including Vite, Gulp, and Webpack
@@ -171,7 +171,7 @@ Create a git repo and push it there:
     git remote add origin git@github.com:pydanny/redditclone.git
     git push -u origin main
 
-Now take a look at your repo. Don't forget to carefully look at the generated README. If you selected Vite, your React + TypeScript frontend will live in ``frontend/``. Awesome, right?
+Now take a look at your repo. Don't forget to carefully look at the generated README. If you selected Vite, your React + TypeScript frontend will live in ``frontend/`` and the generated SPA auth routes will live under ``/account/...`` while Django keeps ``/accounts/...`` and ``/_allauth/...``.
 
 For local development, see the following:
 

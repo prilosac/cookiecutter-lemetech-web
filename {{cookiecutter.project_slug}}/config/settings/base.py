@@ -2,6 +2,7 @@
 """Base settings to build other settings files upon."""
 {% if cookiecutter.use_celery == 'y' %}
 import ssl
+
 {%- endif %}
 from pathlib import Path
 
@@ -87,6 +88,9 @@ THIRD_PARTY_APPS = [
     "crispy_bootstrap5",
     "allauth",
     "allauth.account",
+{%- if cookiecutter.frontend_pipeline == 'Vite' %}
+    "allauth.headless",
+{%- endif %}
     "allauth.mfa",
     "allauth.socialaccount",
 {%- if cookiecutter.use_celery == 'y' %}
@@ -133,11 +137,7 @@ LOGIN_REDIRECT_URL = "home"
 LOGIN_REDIRECT_URL = "users:redirect"
 {%- endif %}
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-url
-{%- if cookiecutter.frontend_pipeline == 'Vite' %}
-LOGIN_URL = "home"
-{%- else %}
 LOGIN_URL = "account_login"
-{%- endif %}
 
 # PASSWORDS
 # ------------------------------------------------------------------------------
@@ -364,6 +364,7 @@ ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 {%- endif %}
 # https://docs.allauth.org/en/latest/account/configuration.html
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 # https://docs.allauth.org/en/latest/account/configuration.html
 ACCOUNT_ADAPTER = "{{cookiecutter.project_slug}}.users.adapters.AccountAdapter"
 # https://docs.allauth.org/en/latest/account/forms.html
@@ -372,6 +373,17 @@ ACCOUNT_FORMS = {"signup": "{{cookiecutter.project_slug}}.users.forms.UserSignup
 SOCIALACCOUNT_ADAPTER = "{{cookiecutter.project_slug}}.users.adapters.SocialAccountAdapter"
 # https://docs.allauth.org/en/latest/socialaccount/configuration.html
 SOCIALACCOUNT_FORMS = {"signup": "{{cookiecutter.project_slug}}.users.forms.UserSocialSignupForm"}
+{%- if cookiecutter.frontend_pipeline == 'Vite' %}
+HEADLESS_CLIENTS = ("browser",)
+HEADLESS_ONLY = True
+HEADLESS_FRONTEND_URLS = {
+    "account_signup": "/account/signup",
+    "account_confirm_email": "/account/verify-email/{key}",
+    "account_reset_password": "/account/password/reset",
+    "account_reset_password_from_key": "/account/password/reset/key/{key}",
+    "socialaccount_login_error": "/account/provider/callback",
+}
+{%- endif %}
 {% if cookiecutter.frontend_pipeline == 'Django Compressor' -%}
 # django-compressor
 # ------------------------------------------------------------------------------

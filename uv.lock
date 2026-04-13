@@ -180,7 +180,7 @@ wheels = [
 ]
 
 [[package]]
-name = "cookiecutter-django"
+name = "cookiecutter-lemetech-web"
 version = "2026.4.3"
 source = { virtual = "." }
 dependencies = [
