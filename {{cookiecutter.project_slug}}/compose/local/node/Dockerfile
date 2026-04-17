@@ -4,6 +4,7 @@ FROM docker.io/node:24.14-bookworm-slim
 WORKDIR /app/frontend
 
 COPY ./frontend/package.json /app/frontend
+COPY ./frontend/src/routes /app/frontend/src/routes
 {%- else %}
 WORKDIR /app
 

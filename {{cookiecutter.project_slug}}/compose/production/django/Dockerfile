@@ -29,6 +29,7 @@ ARG APP_HOME=/app
 WORKDIR ${APP_HOME}/frontend
 
 COPY ./frontend/package.json ${APP_HOME}/frontend
+COPY ./frontend/src/routes ${APP_HOME}/frontend/src/routes
 RUN npm install && npm cache clean --force
 COPY ./frontend ${APP_HOME}/frontend
 RUN npm run build
