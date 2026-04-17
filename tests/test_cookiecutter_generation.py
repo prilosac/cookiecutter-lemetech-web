@@ -498,6 +498,12 @@ def test_vite_headless_auth_contract(cookies, context):
     auth_views = (result.project_path / "config" / "auth_views.py").read_text()
     vite_config = (result.project_path / "frontend" / "vite.config.ts").read_text()
     router = (result.project_path / "frontend" / "src" / "router.tsx").read_text()
+    root_route = result.project_path / "frontend" / "src" / "routes" / "__root.tsx"
+    login_route = result.project_path / "frontend" / "src" / "routes" / "account" / "login.tsx"
+    mfa_route = result.project_path / "frontend" / "src" / "routes" / "account" / "2fa.tsx"
+    provider_callback_route = (
+        result.project_path / "frontend" / "src" / "routes" / "account" / "provider" / "callback.tsx"
+    )
     admin_tests = (result.project_path / context["project_slug"] / "users" / "tests" / "test_admin.py").read_text()
     generated_readme = (result.project_path / "README.md").read_text()
 
@@ -518,10 +524,15 @@ def test_vite_headless_auth_contract(cookies, context):
     assert "'/accounts': {" in vite_config
     assert "'/_allauth': {" in vite_config
 
-    assert "path: '/account/login'" in router
-    assert "path: '/account/2fa'" in router
-    assert "path: '/account/provider/callback'" in router
-    assert "Client-side auth UI is intentionally left for a follow-up change." not in router
+    assert root_route.exists()
+    assert login_route.exists()
+    assert "createRootRoute" in root_route.read_text()
+    assert "createFileRoute('/account/login')" in login_route.read_text()
+    assert "createFileRoute('/account/2fa')" in mfa_route.read_text()
+    assert "createFileRoute('/account/provider/callback')" in provider_callback_route.read_text()
+    assert "import { routeTree } from './routeTree.gen';" in router
+    assert "createRouter({ routeTree })" in router
+    assert "path: '/account/login'" not in router
 
     assert "def test_allauth_login" in admin_tests
     assert "SPA auth surface backed by `allauth.headless`" in generated_readme

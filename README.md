@@ -11,10 +11,8 @@
 Powered by [Cookiecutter](https://github.com/cookiecutter/cookiecutter), Cookiecutter Leme Tech Web is a framework for jumpstarting
 production-ready Django projects quickly.
 
-- Documentation: <https://cookiecutter-django.readthedocs.io/en/latest/>
+- Documentation for Cookiecutter Django (on which this template was originally based): <https://cookiecutter-django.readthedocs.io/en/latest/>
 - See [Troubleshooting](https://cookiecutter-django.readthedocs.io/en/latest/5-help/troubleshooting.html) for common errors and obstacles
-- If you have problems with Cookiecutter Django, please open [issues](https://github.com/cookiecutter/cookiecutter-django/issues/new) don't send
-  emails to the maintainers.
 
 ## Features
 
@@ -32,8 +30,6 @@ production-ready Django projects quickly.
 - Send emails via [Anymail](https://github.com/anymail/django-anymail) (using [Mailgun](http://www.mailgun.com/) by default or Amazon SES if AWS is selected cloud provider, but switchable)
 - Media storage using Amazon S3, Google Cloud Storage, Azure Storage or nginx
 - Docker support using [docker-compose](https://github.com/docker/compose) for development and production (using [Traefik](https://traefik.io/) with [LetsEncrypt](https://letsencrypt.org/) support)
-- [Procfile](https://devcenter.heroku.com/articles/procfile) for deploying to Heroku
-- Instructions for deploying to [PythonAnywhere](https://www.pythonanywhere.com/)
 - Run tests with unittest or pytest
 - Customizable PostgreSQL version
 - Default integration with [pre-commit](https://github.com/pre-commit/pre-commit) for identifying simple issues before submission to code review
@@ -168,31 +164,15 @@ Create a git repo and push it there:
     git init
     git add .
     git commit -m "first awesome commit"
-    git remote add origin git@github.com:pydanny/redditclone.git
+    git remote add origin git@github.com:prilosac/redditclone.git
     git push -u origin main
 
 Now take a look at your repo. Don't forget to carefully look at the generated README. If you selected Vite, your React + TypeScript frontend will live in ``frontend/`` and the generated SPA auth routes will live under ``/account/...`` while Django keeps ``/accounts/...`` and ``/_allauth/...``.
 
-For local development, see the following:
+For local development, see the following. I strongly recommend you use docker, and will likely remove the non-docker path in the future.
 
 - [Developing locally](https://cookiecutter-django.readthedocs.io/en/latest/2-local-development/developing-locally.html)
 - [Developing locally using docker](https://cookiecutter-django.readthedocs.io/en/latest/2-local-development/developing-locally-docker.html)
-
-## Community
-
-- Have questions? **Before you ask questions anywhere else**, please post your question on [Stack Overflow](http://stackoverflow.com/questions/tagged/cookiecutter-django) under the _cookiecutter-django_ tag. We check there periodically for questions.
-- If you think you found a bug or want to request a feature, please open an [issue](https://github.com/cookiecutter/cookiecutter-django/issues).
-- For anything else, you can chat with us on [Discord](https://discord.gg/uFXweDQc5a).
-
-<img src="https://opencollective.com/cookiecutter-django/contributors.svg?width=890&button=false" alt="Contributors">
-
-## For Readers of Two Scoops of Django
-
-You may notice that some elements of this project do not exactly match what we describe in chapter 3. The reason for that is this project, amongst other things, serves as a test bed for trying out new ideas and concepts. Sometimes they work, sometimes they don't, but the end result is that it won't necessarily match precisely what is described in the book I co-authored.
-
-## For PyUp Users
-
-If you are using [PyUp](https://pyup.io) to keep your dependencies updated and secure, use the code _cookiecutter_ during checkout to get 15% off every month.
 
 ## "Your Stuff"
 
@@ -217,8 +197,7 @@ If you have differences in your preferred setup, I encourage you to fork this to
 
 ### Submit a Pull Request
 
-We accept pull requests if they're small, atomic, 
-and make our own project development experience better.
+I'll accept pull requests at my discretion. PRs are welcome, and time is scarce.
 
 ## Articles
 

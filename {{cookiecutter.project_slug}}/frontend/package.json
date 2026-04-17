@@ -9,7 +9,10 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "routes:generate": "tsr generate",
+    "routes:watch": "tsr watch",
+    "postinstall": "tsr generate"
   },
   "dependencies": {
     "@tanstack/react-router": "^1.132.15",
@@ -17,6 +20,8 @@
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
+    "@tanstack/router-cli": "^1.132.15",
+    "@tanstack/router-plugin": "^1.132.15",
     "@tailwindcss/vite": "^4.1.14",
     "@types/node": "^24.8.1",
     "@types/react": "^19.2.2",
