@@ -501,6 +501,7 @@ def test_vite_headless_auth_contract(cookies, context):
     root_route = result.project_path / "frontend" / "src" / "routes" / "__root.tsx"
     login_route = result.project_path / "frontend" / "src" / "routes" / "account" / "login.tsx"
     mfa_route = result.project_path / "frontend" / "src" / "routes" / "account" / "2fa.tsx"
+    profile_route = result.project_path / "frontend" / "src" / "routes" / "account" / "profile.tsx"
     provider_callback_route = (
         result.project_path / "frontend" / "src" / "routes" / "account" / "provider" / "callback.tsx"
     )
@@ -526,9 +527,13 @@ def test_vite_headless_auth_contract(cookies, context):
 
     assert root_route.exists()
     assert login_route.exists()
+    assert profile_route.exists()
     assert "createRootRoute" in root_route.read_text()
+    assert 'to="/account/profile"' in root_route.read_text()
     assert "createFileRoute('/account/login')" in login_route.read_text()
     assert "createFileRoute('/account/2fa')" in mfa_route.read_text()
+    assert "createFileRoute('/account/profile')" in profile_route.read_text()
+    assert "QRCodeSVG" in profile_route.read_text()
     assert "createFileRoute('/account/provider/callback')" in provider_callback_route.read_text()
     assert "import { routeTree } from './routeTree.gen';" in router
     assert "createRouter({ routeTree })" in router

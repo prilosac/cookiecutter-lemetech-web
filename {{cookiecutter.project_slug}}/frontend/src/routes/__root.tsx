@@ -13,7 +13,7 @@ function AppShell() {
     : auth.isAuthenticated
       ? pendingFlowIds.length
         ? `Pending: ${pendingFlowIds.join(', ')}`
-        : auth.user?.email ?? 'Authenticated through allauth.headless.'
+        : 'Have a great day'
       : pendingFlowIds.length
         ? `Pending: ${pendingFlowIds.join(', ')}`
         : 'No authenticated session yet.';
@@ -24,18 +24,17 @@ function AppShell() {
         <header className="space-y-8 border-b border-white/10 pb-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl space-y-3">
-              <p className="text-sm uppercase tracking-[0.35em] text-cyan-300/80">Vite SPA Auth</p>
               <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">{{ cookiecutter.project_name }}</h1>
               <p className="text-base leading-7 text-slate-300">
-                The SPA owns <code className="rounded bg-white/10 px-2 py-1 text-sm">/account/...</code>. Django keeps
-                <code className="ml-1 rounded bg-white/10 px-2 py-1 text-sm">/accounts/...</code>,
-                <code className="ml-1 rounded bg-white/10 px-2 py-1 text-sm">/_allauth/...</code>,
-                <code className="ml-1 rounded bg-white/10 px-2 py-1 text-sm">/api/...</code>, and
-                <code className="ml-1 rounded bg-white/10 px-2 py-1 text-sm">/admin/</code>.
+                by <a href="mailto:{{ cookiecutter.email }}">{{ cookiecutter.author_name }}</a>
               </p>
             </div>
-            <div className="rounded-[1.75rem] border border-cyan-400/20 bg-cyan-400/10 px-5 py-4 text-sm text-cyan-50">
-              <p className="font-semibold">{auth.isAuthenticated ? auth.user?.display ?? 'Signed in' : 'Signed out'}</p>
+            <div className="rounded-[1.75rem] border border-cyan-400/20 bg-cyan-400/10 px-5 py-4 text-sm text-cyan-50 max-w-xs">
+              <p className="font-semibold">{auth.isAuthenticated ?
+                <Link className="rounded-full border border-white/15 px-4 py-2 hover:border-cyan-300 hover:text-white" to="/account/profile">
+                  {auth.user?.display}
+                </Link>
+                : <></>}</p>
               <p className="mt-1 text-cyan-50/80">{authSummary}</p>
             </div>
           </div>
