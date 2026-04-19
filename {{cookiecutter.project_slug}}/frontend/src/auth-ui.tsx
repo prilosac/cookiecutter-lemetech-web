@@ -52,7 +52,7 @@ export function Field({
   value: string;
 }) {
   return (
-    <label className="space-y-2 text-sm text-slate-200">
+    <label className="block space-y-2 text-sm text-slate-200">
       <span className="block font-medium">{label}</span>
       <input
         autoComplete={autoComplete}
