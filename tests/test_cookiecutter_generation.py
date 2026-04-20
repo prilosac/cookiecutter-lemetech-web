@@ -497,6 +497,8 @@ def test_vite_headless_auth_contract(cookies, context):
     urls = (result.project_path / "config" / "urls.py").read_text()
     auth_views = (result.project_path / "config" / "auth_views.py").read_text()
     vite_config = (result.project_path / "frontend" / "vite.config.ts").read_text()
+    auth_routing = (result.project_path / "frontend" / "src" / "auth-routing.ts").read_text()
+    user_adapters = (result.project_path / context["project_slug"] / "users" / "adapters.py").read_text()
     router = (result.project_path / "frontend" / "src" / "router.tsx").read_text()
     root_route = result.project_path / "frontend" / "src" / "routes" / "__root.tsx"
     login_route = result.project_path / "frontend" / "src" / "routes" / "account" / "login.tsx"
@@ -510,6 +512,7 @@ def test_vite_headless_auth_contract(cookies, context):
 
     assert '"allauth.headless"' in base_settings
     assert 'HEADLESS_CLIENTS = ("browser",)' in base_settings
+    assert f'HEADLESS_ADAPTER = "{context["project_slug"]}.users.adapters.HeadlessAdapter"' in base_settings
     assert "HEADLESS_ONLY = True" in base_settings
     assert '"account_confirm_email": "/account/verify-email/{key}"' in base_settings
     assert 'LOGIN_URL = "account_login"' in base_settings
@@ -524,16 +527,22 @@ def test_vite_headless_auth_contract(cookies, context):
 
     assert "'/accounts': {" in vite_config
     assert "'/_allauth': {" in vite_config
+    assert "export function hasFlow" in auth_routing
 
     assert root_route.exists()
     assert login_route.exists()
     assert profile_route.exists()
+    assert "class HeadlessAdapter(DefaultHeadlessAdapter):" in user_adapters
+    assert 'payload["is_superuser"] = user.is_superuser' in user_adapters
     assert "createRootRoute" in root_route.read_text()
     assert 'to="/account/profile"' in root_route.read_text()
+    assert 'href="/admin/"' not in root_route.read_text()
     assert "createFileRoute('/account/login')" in login_route.read_text()
     assert "createFileRoute('/account/2fa')" in mfa_route.read_text()
     assert "createFileRoute('/account/profile')" in profile_route.read_text()
+    assert "auth.user?.is_superuser" in profile_route.read_text()
     assert "QRCodeSVG" in profile_route.read_text()
+    assert "hasFlow(response, 'reauthenticate')" in profile_route.read_text()
     assert "createFileRoute('/account/provider/callback')" in provider_callback_route.read_text()
     assert "import { routeTree } from './routeTree.gen';" in router
     assert "createRouter({ routeTree })" in router

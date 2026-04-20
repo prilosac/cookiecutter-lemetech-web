@@ -20,6 +20,7 @@ export interface AuthUser {
   email?: string;
   has_usable_password?: boolean;
   id?: number | string | null;
+  is_superuser?: boolean;
   username?: string;
 }
 

@@ -2,7 +2,7 @@ import { createFileRoute, type SearchSchemaInput } from '@tanstack/react-router'
 
 import { useAuth } from '../../../auth';
 import { sanitizeNext } from '../../../auth-routing';
-import { AuthCard, LoadingPanel, PageIntro } from '../../../auth-ui';
+import { AuthCard, PageIntro } from '../../../auth-ui';
 
 export const Route = createFileRoute('/account/verify-email/')({
   validateSearch: (search: SearchSchemaInput & { next?: string }) => ({
@@ -14,10 +14,6 @@ export const Route = createFileRoute('/account/verify-email/')({
 function VerifyEmailPage() {
   const auth = useAuth();
   const { next: nextValue } = Route.useSearch();
-
-  if (auth.isLoading) {
-    return <LoadingPanel message="Loading verification state." />;
-  }
 
   return (
     <AuthCard className="max-w-3xl">

@@ -375,6 +375,7 @@ SOCIALACCOUNT_ADAPTER = "{{cookiecutter.project_slug}}.users.adapters.SocialAcco
 SOCIALACCOUNT_FORMS = {"signup": "{{cookiecutter.project_slug}}.users.forms.UserSocialSignupForm"}
 {%- if cookiecutter.frontend_pipeline == 'Vite' %}
 HEADLESS_CLIENTS = ("browser",)
+HEADLESS_ADAPTER = "{{cookiecutter.project_slug}}.users.adapters.HeadlessAdapter"
 HEADLESS_ONLY = True
 HEADLESS_FRONTEND_URLS = {
     "account_signup": "/account/signup",

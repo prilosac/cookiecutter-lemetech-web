@@ -9,14 +9,14 @@ function AppShell() {
   const auth = useAuth();
   const pendingFlowIds = collectFlowIds(auth.flows);
   const authSummary = auth.isLoading
-    ? 'Bootstrapping session state...'
+    ? ''
     : auth.isAuthenticated
       ? pendingFlowIds.length
         ? `Pending: ${pendingFlowIds.join(', ')}`
-        : 'Have a great day'
+        : ''
       : pendingFlowIds.length
         ? `Pending: ${pendingFlowIds.join(', ')}`
-        : 'No authenticated session yet.';
+        : '';
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
@@ -29,13 +29,27 @@ function AppShell() {
                 by <a href="mailto:{{ cookiecutter.email }}">{{ cookiecutter.author_name }}</a>
               </p>
             </div>
-            <div className="rounded-[1.75rem] border border-cyan-400/20 bg-cyan-400/10 px-5 py-4 text-sm text-cyan-50 max-w-xs">
-              <p className="font-semibold">{auth.isAuthenticated ?
-                <Link className="rounded-full border border-white/15 px-4 py-2 hover:border-cyan-300 hover:text-white" to="/account/profile">
-                  {auth.user?.display}
-                </Link>
-                : <></>}</p>
-              <p className="mt-1 text-cyan-50/80">{authSummary}</p>
+            <div className="rounded-[1.75rem] border border-cyan-400/20 bg-cyan-400/10 px-5 py-4 text-sm text-cyan-50 max-w-3xs space-y-2">
+              {auth.isAuthenticated ?
+                <div className="flex flex-col items-end gap-2 font-semibold">
+                  <Link className="rounded-full border border-white/15 px-4 py-2 hover:border-cyan-300 hover:text-white" to="/account/profile">
+                    {auth.user?.display}
+                  </Link>
+                  <Link className="rounded-full border border-white/15 px-4 py-2 hover:border-cyan-300 hover:text-white" to="/account/logout">
+                    Logout
+                  </Link>
+                </div>
+                : <div className="flex flex-col items-end gap-2 font-semibold">
+                  <Link className="rounded-full border border-white/15 px-4 py-2 hover:border-cyan-300 hover:text-white" to="/account/login">
+                    Login
+                  </Link>
+                  <Link className="rounded-full border border-white/15 px-4 py-2 hover:border-cyan-300 hover:text-white" to="/account/signup">
+                    Signup
+                  </Link>
+                </div>}
+              {authSummary.length > 0 ?
+                <p className="text-cyan-50/80">{authSummary}</p>
+                : <></>}
             </div>
           </div>
 
@@ -46,29 +60,6 @@ function AppShell() {
             <Link className="rounded-full border border-white/15 px-4 py-2 hover:border-cyan-300 hover:text-white" to="/about">
               About
             </Link>
-            {auth.isAuthenticated ? null : (
-              <>
-                <Link className="rounded-full border border-white/15 px-4 py-2 hover:border-cyan-300 hover:text-white" to="/account/login">
-                  Login
-                </Link>
-                <Link className="rounded-full border border-white/15 px-4 py-2 hover:border-cyan-300 hover:text-white" to="/account/signup">
-                  Signup
-                </Link>
-              </>
-            )}
-            {auth.isAuthenticated ? (
-              <>
-                <Link className="rounded-full border border-white/15 px-4 py-2 hover:border-cyan-300 hover:text-white" to="/account/logout">
-                  Logout
-                </Link>
-                <Link className="rounded-full border border-white/15 px-4 py-2 hover:border-cyan-300 hover:text-white" to="/account/password/reset">
-                  Reset password
-                </Link>
-              </>
-            ) : null}
-            <a className="rounded-full border border-white/15 px-4 py-2 hover:border-cyan-300 hover:text-white" href="/admin/">
-              Admin
-            </a>
           </nav>
         </header>
 

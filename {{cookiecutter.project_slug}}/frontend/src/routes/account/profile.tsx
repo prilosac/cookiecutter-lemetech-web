@@ -1,10 +1,10 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { QRCodeSVG } from 'qrcode.react';
 import { useEffect, useState } from 'react';
 
 import { useAuth } from '../../auth';
-import { buildAccountPath, formatErrors, hasPendingFlow } from '../../auth-routing';
-import { AuthCard, ErrorPanel, Field, LoadingPanel, PageIntro, SubmitButton } from '../../auth-ui';
+import { buildAccountPath, formatErrors, hasFlow } from '../../auth-routing';
+import { AuthCard, ErrorPanel, Field, PageIntro, SubmitButton } from '../../auth-ui';
 import { HEADLESS_BROWSER_BASE_PATH, type AuthFlow, type HeadlessResponse } from '../../lib/auth';
 
 export const Route = createFileRoute('/account/profile')({ component: ProfilePage });
@@ -57,6 +57,7 @@ function ProfilePage() {
   const [errors, setErrors] = useState<string[]>([]);
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
   const [isActivating, setIsActivating] = useState(false);
+  const [isDisabling, setIsDisabling] = useState(false);
   const [isLoadingAuthenticators, setIsLoadingAuthenticators] = useState(true);
   const [isPreparingSetup, setIsPreparingSetup] = useState(false);
   const [isReauthenticating, setIsReauthenticating] = useState(false);
@@ -69,6 +70,7 @@ function ProfilePage() {
     requiresPasswordReauthentication || auth.flows.some((flow) => flow.id === 'reauthenticate' && flow.is_pending);
   const pendingMFAReauthentication =
     requiresMFAReauthentication || auth.flows.some((flow) => flow.id === 'mfa_reauthenticate' && flow.is_pending);
+  const isSuperuser = Boolean(auth.user?.is_superuser);
 
   async function loadAuthenticators() {
     setIsLoadingAuthenticators(true);
@@ -119,10 +121,6 @@ function ProfilePage() {
     void loadAuthenticators();
   }, [auth.isAuthenticated, auth.isLoading]);
 
-  //if (auth.isLoading || (auth.isAuthenticated && isLoadingAuthenticators)) {
-  //  return <LoadingPanel message="Loading the account security surface." />;
-  //}
-
   if (!auth.isAuthenticated) {
     return (
       <AuthCard className="max-w-3xl">
@@ -149,6 +147,16 @@ function ProfilePage() {
   const recoveryAuthenticator = authenticators.find(
     (authenticator): authenticator is RecoveryCodesAuthenticator => authenticator.type === 'recovery_codes',
   );
+
+  function syncReauthenticationRequirements(response: HeadlessResponse) {
+    const requiresPassword = hasFlow(response, 'reauthenticate');
+    const requiresMFA = hasFlow(response, 'mfa_reauthenticate');
+
+    setRequiresPasswordReauthentication(requiresPassword);
+    setRequiresMFAReauthentication(requiresMFA);
+
+    return { requiresMFA, requiresPassword };
+  }
 
   async function handleStartSetup() {
     setErrors([]);
@@ -208,11 +216,7 @@ function ProfilePage() {
       }
 
       if (response.status === 401) {
-        const requiresPassword = hasPendingFlow(response, 'reauthenticate');
-        const requiresMFA = hasPendingFlow(response, 'mfa_reauthenticate');
-
-        setRequiresPasswordReauthentication(requiresPassword);
-        setRequiresMFAReauthentication(requiresMFA);
+        const { requiresMFA, requiresPassword } = syncReauthenticationRequirements(response);
 
         if (requiresPassword) {
           setErrors(['Recent sign-in required before enabling two-factor authentication. Re-enter your password below.']);
@@ -224,13 +228,67 @@ function ProfilePage() {
           return;
         }
 
-        setErrors(responseErrors(response, 'Recent sign-in required before enabling two-factor authentication.'));
+        setErrors(responseErrors(response, 'Recent sign-in required before enabling two-factor authentication. Please sign out and sign back in'));
         return;
       }
 
       setErrors(responseErrors(response, 'Unable to activate two-factor authentication.'));
     } finally {
       setIsActivating(false);
+    }
+  }
+
+  async function handleDisableTOTP() {
+    setErrors([]);
+    setInfoMessage(null);
+    setIsDisabling(true);
+
+    try {
+      const response = await auth.request(`${HEADLESS_BROWSER_BASE_PATH}/account/authenticators/totp`, {
+        method: 'DELETE',
+      });
+
+      if (response.status === 200 && !response.errors) {
+        setActivationCode('');
+        setAuthenticators((current) =>
+          current.filter((authenticator) => authenticator.type !== 'recovery_codes' && authenticator.type !== 'totp'),
+        );
+        setRecoveryCodes(null);
+        setSetupMeta(null);
+        setRequiresMFAReauthentication(false);
+        setRequiresPasswordReauthentication(false);
+        setInfoMessage('Two-factor authentication has been disabled for this account.');
+        await loadAuthenticators();
+        return;
+      }
+
+      if (response.status === 401) {
+        const { requiresMFA, requiresPassword } = syncReauthenticationRequirements(response);
+
+        if (requiresPassword) {
+          setErrors([
+            'Recent sign-in required before disabling two-factor authentication. Re-enter your password below.',
+          ]);
+          return;
+        }
+
+        if (requiresMFA) {
+          setErrors(['Another MFA check is required before changing authenticators for this account.']);
+          return;
+        }
+
+        setErrors(
+          responseErrors(
+            response,
+            'Recent sign-in required before disabling two-factor authentication. Please sign out and sign back in',
+          ),
+        );
+        return;
+      }
+
+      setErrors(responseErrors(response, 'Unable to disable two-factor authentication.'));
+    } finally {
+      setIsDisabling(false);
     }
   }
 
@@ -250,13 +308,12 @@ function ProfilePage() {
         setPassword('');
         setRequiresMFAReauthentication(false);
         setRequiresPasswordReauthentication(false);
-        setInfoMessage('Session refreshed. You can continue enabling two-factor authentication now.');
+        setInfoMessage('Session refreshed. You can continue updating two-factor authentication now.');
         return;
       }
 
       if (response.status === 401) {
-        setRequiresPasswordReauthentication(hasPendingFlow(response, 'reauthenticate'));
-        setRequiresMFAReauthentication(hasPendingFlow(response, 'mfa_reauthenticate'));
+        syncReauthenticationRequirements(response);
       }
 
       setErrors(responseErrors(response, 'Unable to refresh the current session.'));
@@ -269,15 +326,35 @@ function ProfilePage() {
     <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
       <AuthCard>
         <PageIntro
-          eyebrow="Manage Profile"
+          eyebrow="Profile"
         />
         <div className="mt-8 grid gap-4">
           <div className="rounded-2xl border border-white/10 bg-slate-950/70 p-5 text-sm leading-6 text-slate-300">
             <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Signed-in account</p>
             <p className="mt-3 text-lg font-semibold text-white">{auth.user?.display ?? 'Authenticated user'}</p>
-            <p className="mt-2">{auth.user?.email ?? 'No public email is available on the session.'}</p>
           </div>
         </div>
+        <div className="mt-8 grid gap-4">
+          <div className="rounded-2xl border border-white/10 bg-slate-950/70 p-5 text-sm leading-6 text-slate-300">
+            <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Manage</p>
+            <Link className="mt-4 inline-flex rounded-full border border-white/15 px-5 py-3 font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-100" to="/account/password/reset">
+              Reset password
+            </Link>
+          </div>
+        </div>
+        {isSuperuser ? (
+          <div className="mt-2 grid gap-4">
+            <div className="rounded-2xl border border-white/10 bg-slate-950/70 p-5 text-sm leading-6 text-slate-300">
+              <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Staff Tools</p>
+              <a
+                className="mt-4 inline-flex rounded-full border border-white/15 px-5 py-3 font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-100"
+                href="/admin/"
+              >
+                Admin
+              </a>
+            </div>
+          </div>
+        ) : null}
       </AuthCard>
 
       <AuthCard className="space-y-6 border-cyan-400/20 bg-cyan-400/10">
@@ -328,6 +405,19 @@ function ProfilePage() {
               {recoveryAuthenticator ? (
                 <p className="mt-4">Recovery codes available: <span className="font-semibold text-white">{recoveryAuthenticator.unused_code_count}</span> of {recoveryAuthenticator.total_code_count} unused.</p>
               ) : null}
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <button
+                  className="rounded-full border border-rose-300/30 px-5 py-3 text-sm font-semibold text-rose-100 transition hover:border-rose-200 hover:text-white disabled:cursor-not-allowed disabled:border-white/10 disabled:text-slate-500"
+                  disabled={isDisabling}
+                  onClick={() => {
+                    void handleDisableTOTP();
+                  }}
+                  type="button"
+                >
+                  {isDisabling ? 'Disabling 2FA...' : 'Disable 2FA'}
+                </button>
+                <p className="text-sm text-slate-400">This removes the current authenticator and its recovery codes.</p>
+              </div>
             </>
           ) : (
             <>

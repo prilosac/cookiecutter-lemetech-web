@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 import { useAuth } from '../../auth';
 import { formatErrors } from '../../auth-routing';
-import { AuthCard, ErrorPanel, LoadingPanel, PageIntro, SubmitButton } from '../../auth-ui';
+import { AuthCard, ErrorPanel, PageIntro, SubmitButton } from '../../auth-ui';
 import { HEADLESS_BROWSER_BASE_PATH } from '../../lib/auth';
 
 export const Route = createFileRoute('/account/logout')({ component: LogoutPage });
@@ -12,10 +12,6 @@ function LogoutPage() {
   const auth = useAuth();
   const [errors, setErrors] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  if (auth.isLoading) {
-    return <LoadingPanel message="Checking whether there is an active session to log out." />;
-  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -41,7 +37,7 @@ function LogoutPage() {
   return (
     <AuthCard className="max-w-2xl">
       <PageIntro
-        description="Logout uses the browser-session endpoint, clears the Django session, and lets the SPA render the anonymous state again."
+        description=""
         eyebrow="Logout"
         title={auth.isAuthenticated ? 'Sign out of the current session' : 'There is no active session to close'}
       />

@@ -3,6 +3,7 @@ from __future__ import annotations
 import typing
 
 from allauth.account.adapter import DefaultAccountAdapter
+from allauth.headless.adapter import DefaultHeadlessAdapter
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from django.conf import settings
 
@@ -46,3 +47,10 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
                 if last_name := data.get("last_name"):
                     user.name += f" {last_name}"
         return user
+
+
+class HeadlessAdapter(DefaultHeadlessAdapter):
+    def serialize_user(self, user) -> dict[str, typing.Any]:
+        payload = super().serialize_user(user)
+        payload["is_superuser"] = user.is_superuser
+        return payload

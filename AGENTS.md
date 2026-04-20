@@ -106,6 +106,7 @@ In Vite mode, local frontend development is browser -> Vite on `:5173` -> Django
 - **djLint** for HTML template linting with `profile = "jinja"`
 - Template files under `{{cookiecutter.project_slug}}/` are excluded from ruff (not parseable Python)
 - **Calendar versioning**: `YYYY.MM.DD`
+- For frontend interactions, prefer optimistic UI updates over blocking loading states when the change is safe to reconcile or roll back if the request fails.
 
 ## Adding a New Template Option
 

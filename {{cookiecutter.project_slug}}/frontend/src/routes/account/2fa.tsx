@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 
 import { useAuth } from '../../auth';
 import { formatErrors, handleAuthenticationOutcome, redirectToNext, sanitizeNext } from '../../auth-routing';
-import { AuthCard, ErrorPanel, Field, LoadingPanel, PageIntro, SubmitButton } from '../../auth-ui';
+import { AuthCard, ErrorPanel, Field, PageIntro, SubmitButton } from '../../auth-ui';
 import { HEADLESS_BROWSER_BASE_PATH } from '../../lib/auth';
 
 export const Route = createFileRoute('/account/2fa')({
@@ -28,10 +28,6 @@ function MFAChallengePage() {
       redirectToNext(nextValue);
     }
   }, [auth.isAuthenticated, auth.isLoading, nextValue, pendingMFA, pendingTrust]);
-
-  if (auth.isLoading) {
-    return <LoadingPanel message="Loading any pending MFA stage." />;
-  }
 
   async function handleCodeSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();

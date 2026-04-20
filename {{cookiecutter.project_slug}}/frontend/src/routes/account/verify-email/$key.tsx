@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 
 import { useAuth } from '../../../auth';
 import { formatErrors, handleAuthenticationOutcome, sanitizeNext } from '../../../auth-routing';
-import { AuthCard, ErrorPanel, LoadingPanel, PageIntro, SubmitButton } from '../../../auth-ui';
+import { AuthCard, ErrorPanel, PageIntro, SubmitButton } from '../../../auth-ui';
 import { HEADLESS_BROWSER_BASE_PATH } from '../../../lib/auth';
 
 export const Route = createFileRoute('/account/verify-email/$key')({
@@ -81,10 +81,6 @@ function VerifyEmailKeyPage() {
     } finally {
       setIsSubmitting(false);
     }
-  }
-
-  if (isLoading) {
-    return <LoadingPanel message="Checking that the email verification link is still valid." />;
   }
 
   return (

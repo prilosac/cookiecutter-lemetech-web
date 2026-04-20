@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 
 import { useAuth } from '../../../../../auth';
 import { formatErrors } from '../../../../../auth-routing';
-import { AuthCard, ErrorPanel, Field, LoadingPanel, PageIntro, SubmitButton } from '../../../../../auth-ui';
+import { AuthCard, ErrorPanel, Field, PageIntro, SubmitButton } from '../../../../../auth-ui';
 import { HEADLESS_BROWSER_BASE_PATH, type HeadlessResponse, type PasswordResetData, requestAuth } from '../../../../../lib/auth';
 
 export const Route = createFileRoute('/account/password/reset/key/$key')({ component: ResetPasswordKeyPage });
@@ -72,10 +72,6 @@ function ResetPasswordKeyPage() {
     } finally {
       setIsSubmitting(false);
     }
-  }
-
-  if (isLoading) {
-    return <LoadingPanel message="Validating the password reset key." />;
   }
 
   return (
