@@ -7,16 +7,6 @@ export const Route = createRootRoute({ component: AppShell });
 
 function AppShell() {
   const auth = useAuth();
-  const pendingFlowIds = collectFlowIds(auth.flows);
-  const authSummary = auth.isLoading
-    ? ''
-    : auth.isAuthenticated
-      ? pendingFlowIds.length
-        ? `Pending: ${pendingFlowIds.join(', ')}`
-        : ''
-      : pendingFlowIds.length
-        ? `Pending: ${pendingFlowIds.join(', ')}`
-        : '';
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
@@ -47,9 +37,6 @@ function AppShell() {
                     Signup
                   </Link>
                 </div>}
-              {authSummary.length > 0 ?
-                <p className="text-cyan-50/80">{authSummary}</p>
-                : <></>}
             </div>
           </div>
 

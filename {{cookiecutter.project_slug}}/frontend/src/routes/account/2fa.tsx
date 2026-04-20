@@ -13,6 +13,17 @@ export const Route = createFileRoute('/account/2fa')({
   component: MFAChallengePage,
 });
 
+function formatAuthenticatorLabel(type: string) {
+  if (type === 'totp') {
+    return 'TOTP (authenticator app)';
+  }
+
+  return type
+    .replaceAll('_', ' ')
+    .toLowerCase()
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
 function MFAChallengePage() {
   const auth = useAuth();
   const { next: nextValue } = Route.useSearch();
@@ -22,6 +33,7 @@ function MFAChallengePage() {
   const [trust, setTrust] = useState(false);
   const pendingMFA = auth.flows.find((flow) => flow.id === 'mfa_authenticate' && flow.is_pending);
   const pendingTrust = auth.flows.find((flow) => flow.id === 'mfa_trust' && flow.is_pending);
+  const acceptedAuthenticators = pendingMFA?.types ?? auth.mfaConfig?.supported_types ?? ['TOTP (authenticator app)', 'Recovery Codes'];
 
   useEffect(() => {
     if (!auth.isLoading && auth.isAuthenticated && !pendingMFA && !pendingTrust) {
@@ -95,7 +107,11 @@ function MFAChallengePage() {
           <form className="space-y-5" onSubmit={handleCodeSubmit}>
             <div className="rounded-2xl border border-white/10 bg-slate-950/70 p-5 text-sm leading-6 text-slate-300">
               <p className="font-semibold text-white">Accepted authenticators</p>
-              <p className="mt-2">{pendingMFA.types?.join(', ') ?? auth.mfaConfig?.supported_types?.join(', ') ?? 'TOTP or recovery codes'}</p>
+              <ul className="mt-2 list-disc space-y-1 pl-5">
+                {acceptedAuthenticators.map((type, index) => (
+                  <li key={`${type}-${index}`}>{formatAuthenticatorLabel(type)}</li>
+                ))}
+              </ul>
             </div>
             <Field autoComplete="one-time-code" label="Verification code" onChange={setCode} value={code} />
             <ErrorPanel errors={errors} />
