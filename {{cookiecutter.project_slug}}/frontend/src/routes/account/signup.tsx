@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 
 import { useAuth } from '../../auth';
 import { buildAccountPath, formatErrors, handleAuthenticationOutcome, redirectToNext, sanitizeNext } from '../../auth-routing';
-import { AuthCard, ErrorPanel, Field, LoadingPanel, PageIntro, ProviderButtons, SubmitButton } from '../../auth-ui';
+import { AuthCard, ErrorPanel, Field, PageIntro, ProviderButtons, SubmitButton } from '../../auth-ui';
 import { HEADLESS_BROWSER_BASE_PATH } from '../../lib/auth';
 
 export const Route = createFileRoute('/account/signup')({
@@ -20,9 +20,9 @@ function SignupPage() {
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  {% - if cookiecutter.username_type == 'username' %}
+  {%- if cookiecutter.username_type == 'username' %}
   const [username, setUsername] = useState('');
-  {% - endif %}
+  {%- endif %}
 
   useEffect(() => {
     if (!auth.isLoading && auth.isAuthenticated) {
@@ -52,45 +52,45 @@ function SignupPage() {
         body: {
           email,
           password,
-          {% - if cookiecutter.username_type == 'username' %}
+          {%- if cookiecutter.username_type == 'username' %}
           username,
-      {% - endif %}
-},
-method: 'POST',
+          {%- endif %}
+        },
+        method: 'POST',
       });
 
-if (handleAuthenticationOutcome(response, nextValue)) {
-  return;
-}
+      if (handleAuthenticationOutcome(response, nextValue)) {
+        return;
+      }
 
-if (!response.errors) {
-  window.location.assign(buildAccountPath('/account/verify-email', nextValue));
-  return;
-}
+      if (!response.errors) {
+        window.location.assign(buildAccountPath('/account/verify-email', nextValue));
+        return;
+      }
 
-setErrors(formatErrors(response.errors));
+      setErrors(formatErrors(response.errors));
     } finally {
-  setIsSubmitting(false);
-}
+      setIsSubmitting(false);
+    }
   }
 
-return (
-  <div className="grid gap-6 lg:grid-cols-1">
-    <AuthCard className="max-w-xl">
-      <PageIntro
-        eyebrow="Signup"
-        title="Create an account"
-      />
-      <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
-        <Field autoComplete="email" label="Email address" onChange={setEmail} type="email" value={email} />
-        {% - if cookiecutter.username_type == 'username' %}
-        <Field autoComplete="username" label="Username" onChange={setUsername} value={username} />
-        {% - endif %}
-        <Field autoComplete="new-password" label="Password" onChange={setPassword} type="password" value={password} />
-        <ErrorPanel errors={errors} />
-        <SubmitButton disabled={isSubmitting}>{isSubmitting ? 'Creating account...' : 'Create account'}</SubmitButton>
-      </form>
-    </AuthCard>
-  </div>
-);
+  return (
+    <div className="grid gap-6 lg:grid-cols-1">
+      <AuthCard className="max-w-xl">
+        <PageIntro
+          eyebrow="Signup"
+          title="Create an account"
+        />
+        <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
+          <Field autoComplete="email" label="Email address" onChange={setEmail} type="email" value={email} />
+          {%- if cookiecutter.username_type == 'username' %}
+          <Field autoComplete="username" label="Username" onChange={setUsername} value={username} />
+          {%- endif %}
+          <Field autoComplete="new-password" label="Password" onChange={setPassword} type="password" value={password} />
+          <ErrorPanel errors={errors} />
+          <SubmitButton disabled={isSubmitting}>{isSubmitting ? 'Creating account...' : 'Create account'}</SubmitButton>
+        </form>
+      </AuthCard>
+    </div>
+  );
 }

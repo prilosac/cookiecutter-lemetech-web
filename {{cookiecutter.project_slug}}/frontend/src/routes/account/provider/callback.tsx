@@ -110,10 +110,6 @@ function ProviderCallbackPage() {
     }
   }
 
-  if (auth.isLoading || isLoadingSignup) {
-    return <LoadingPanel message="Finishing the provider callback through the backend session." />;
-  }
-
   return (
     <AuthCard className="max-w-3xl">
       <PageIntro

@@ -1,5 +1,9 @@
 import type { AuthFlow, HeadlessError, HeadlessResponse } from './lib/auth';
 
+function getFlows(response: HeadlessResponse | null | undefined) {
+  return ((response?.data as { flows?: AuthFlow[] } | undefined)?.flows ?? []) as AuthFlow[];
+}
+
 export function sanitizeNext(nextValue: string | null | undefined) {
   if (!nextValue || !nextValue.startsWith('/') || nextValue.startsWith('//')) {
     return '/';
@@ -22,8 +26,11 @@ export function redirectToNext(nextValue?: string | null) {
 }
 
 export function hasPendingFlow(response: HeadlessResponse | null | undefined, flowId: string) {
-  const flows = (response?.data as { flows?: AuthFlow[] } | undefined)?.flows ?? [];
-  return flows.some((flow) => flow.id === flowId && flow.is_pending);
+  return getFlows(response).some((flow) => flow.id === flowId && flow.is_pending);
+}
+
+export function hasFlow(response: HeadlessResponse | null | undefined, flowId: string) {
+  return getFlows(response).some((flow) => flow.id === flowId);
 }
 
 export function collectFlowIds(flows: AuthFlow[]) {

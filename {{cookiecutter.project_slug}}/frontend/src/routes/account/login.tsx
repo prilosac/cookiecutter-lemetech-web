@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 
 import { useAuth } from '../../auth';
 import { formatErrors, handleAuthenticationOutcome, redirectToNext, sanitizeNext } from '../../auth-routing';
-import { AuthCard, ErrorPanel, Field, LoadingPanel, PageIntro, ProviderButtons, SubmitButton } from '../../auth-ui';
+import { AuthCard, ErrorPanel, Field, PageIntro, ProviderButtons, SubmitButton } from '../../auth-ui';
 import { HEADLESS_BROWSER_BASE_PATH } from '../../lib/auth';
 
 export const Route = createFileRoute('/account/login')({
