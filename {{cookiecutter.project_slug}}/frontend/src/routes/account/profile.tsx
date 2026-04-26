@@ -1,13 +1,22 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, redirect } from '@tanstack/react-router';
 import { QRCodeSVG } from 'qrcode.react';
 import { useEffect, useState } from 'react';
 
 import { useAuth } from '../../auth';
-import { buildAccountPath, formatErrors, hasFlow } from '../../auth-routing';
+import { formatErrors, hasFlow } from '../../auth-routing';
 import { AuthCard, ErrorPanel, Field, PageIntro, SubmitButton } from '../../auth-ui';
 import { HEADLESS_BROWSER_BASE_PATH, type AuthFlow, type HeadlessResponse } from '../../lib/auth';
 
-export const Route = createFileRoute('/account/profile')({ component: ProfilePage });
+export const Route = createFileRoute('/account/profile')({
+  beforeLoad: async ({ context }) => {
+    const auth = await context.auth.waitForReady();
+
+    if (!auth.isAuthenticated) {
+      throw redirect({ replace: true, to: '/' });
+    }
+  },
+  component: ProfilePage,
+});
 
 interface BaseAuthenticator {
   created_at: number;
@@ -120,26 +129,6 @@ function ProfilePage() {
 
     void loadAuthenticators();
   }, [auth.isAuthenticated, auth.isLoading]);
-
-  if (!auth.isAuthenticated) {
-    return (
-      <AuthCard className="max-w-3xl">
-        <PageIntro
-          description="This placeholder profile route only renders for signed-in users. The login flow stays in the SPA and returns here afterward."
-          eyebrow="Profile"
-          title="Sign in to manage your account"
-        />
-        <div className="mt-8">
-          <a
-            className="inline-flex rounded-full bg-cyan-300 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200"
-            href={buildAccountPath('/account/login', '/account/profile')}
-          >
-            Go to login
-          </a>
-        </div>
-      </AuthCard>
-    );
-  }
 
   const totpAuthenticator = authenticators.find(
     (authenticator): authenticator is TOTPAuthenticator => authenticator.type === 'totp',

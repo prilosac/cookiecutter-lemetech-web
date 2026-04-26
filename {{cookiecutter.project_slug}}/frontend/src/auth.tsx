@@ -17,7 +17,7 @@ import {
   type SocialProvider,
 } from './lib/auth';
 
-interface AuthContextValue {
+export interface AuthContextValue {
   accountConfig: AccountConfig | null;
   config: AuthBootstrap['config'] | null;
   csrfToken: string | null;
@@ -37,6 +37,34 @@ interface AuthContextValue {
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+
+let currentAuthContextValue: AuthContextValue | null = null;
+let resolveAuthReady: ((value: AuthContextValue) => void) | null = null;
+const authReadyPromise = new Promise<AuthContextValue>((resolve) => {
+  resolveAuthReady = resolve;
+});
+
+function publishAuthContextValue(value: AuthContextValue) {
+  currentAuthContextValue = value;
+
+  if (!value.isLoading && resolveAuthReady) {
+    resolveAuthReady(value);
+    resolveAuthReady = null;
+  }
+}
+
+export const routerAuth = {
+  getSnapshot() {
+    return currentAuthContextValue;
+  },
+  waitForReady() {
+    if (currentAuthContextValue && !currentAuthContextValue.isLoading) {
+      return Promise.resolve(currentAuthContextValue);
+    }
+
+    return authReadyPromise;
+  },
+};
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [bootstrap, setBootstrap] = useState<AuthBootstrap | null>(null);
@@ -131,6 +159,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     session,
     user,
   } satisfies AuthContextValue;
+
+  useEffect(() => {
+    publishAuthContextValue(authContextValue);
+  }, [authContextValue]);
 
   return (
     <AuthContext value={authContextValue}>

@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 
 import { useAuth } from '../../auth';
@@ -6,10 +6,20 @@ import { formatErrors } from '../../auth-routing';
 import { AuthCard, ErrorPanel, PageIntro, SubmitButton } from '../../auth-ui';
 import { HEADLESS_BROWSER_BASE_PATH } from '../../lib/auth';
 
-export const Route = createFileRoute('/account/logout')({ component: LogoutPage });
+export const Route = createFileRoute('/account/logout')({
+  beforeLoad: async ({ context }) => {
+    const auth = await context.auth.waitForReady();
+
+    if (!auth.isAuthenticated) {
+      throw redirect({ replace: true, to: '/' });
+    }
+  },
+  component: LogoutPage,
+});
 
 function LogoutPage() {
   const auth = useAuth();
+  const navigate = useNavigate();
   const [errors, setErrors] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -24,7 +34,7 @@ function LogoutPage() {
       });
 
       if (!response.errors) {
-        window.location.assign('/');
+        void navigate({ replace: true, to: '/' });
         return;
       }
 
@@ -39,14 +49,12 @@ function LogoutPage() {
       <PageIntro
         description=""
         eyebrow="Logout"
-        title={auth.isAuthenticated ? 'Sign out of the current session' : 'There is no active session to close'}
+        title="Sign out of the current session"
       />
-      {auth.isAuthenticated ? (
-        <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
-          <ErrorPanel errors={errors} />
-          <SubmitButton disabled={isSubmitting}>{isSubmitting ? 'Signing out...' : 'Sign out'}</SubmitButton>
-        </form>
-      ) : null}
+      <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
+        <ErrorPanel errors={errors} />
+        <SubmitButton disabled={isSubmitting}>{isSubmitting ? 'Signing out...' : 'Sign out'}</SubmitButton>
+      </form>
     </AuthCard>
   );
 }

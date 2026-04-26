@@ -1,5 +1,9 @@
 import type { AuthFlow, HeadlessError, HeadlessResponse } from './lib/auth';
 
+type AppNavigate = (options: { replace?: boolean; to: string }) => void | Promise<void>;
+
+const DJANGO_OWNED_REDIRECT_PREFIXES = ['/admin/', '/accounts/', '/_allauth/'];
+
 function getFlows(response: HeadlessResponse | null | undefined) {
   return ((response?.data as { flows?: AuthFlow[] } | undefined)?.flows ?? []) as AuthFlow[];
 }
@@ -21,8 +25,23 @@ export function buildAccountPath(path: string, nextValue?: string | null) {
   return `${path}?${new URLSearchParams({ next }).toString()}`;
 }
 
-export function redirectToNext(nextValue?: string | null) {
-  window.location.assign(sanitizeNext(nextValue ?? null));
+function isDjangoOwnedRedirect(nextValue: string) {
+  return DJANGO_OWNED_REDIRECT_PREFIXES.some((prefix) => nextValue.startsWith(prefix));
+}
+
+export function redirectToNext(nextValue: string | null | undefined, navigate: AppNavigate) {
+  const next = sanitizeNext(nextValue ?? null);
+
+  if (isDjangoOwnedRedirect(next)) {
+    window.location.assign(next);
+    return;
+  }
+
+  void navigate({ replace: true, to: next });
+}
+
+export function navigateToAccountPath(path: string, nextValue: string | null | undefined, navigate: AppNavigate) {
+  void navigate({ replace: true, to: buildAccountPath(path, nextValue) });
 }
 
 export function hasPendingFlow(response: HeadlessResponse | null | undefined, flowId: string) {
@@ -41,21 +60,21 @@ export function formatErrors(errors: HeadlessError[] | undefined) {
   return (errors ?? []).map((error) => error.message);
 }
 
-export function handleAuthenticationOutcome(response: HeadlessResponse, nextValue?: string | null) {
+export function handleAuthenticationOutcome(response: HeadlessResponse, nextValue: string | null | undefined, navigate: AppNavigate) {
   const meta = response.meta as { is_authenticated?: boolean } | undefined;
 
   if (meta?.is_authenticated) {
-    redirectToNext(nextValue);
+    redirectToNext(nextValue, navigate);
     return true;
   }
 
   if (hasPendingFlow(response, 'mfa_authenticate') || hasPendingFlow(response, 'mfa_trust')) {
-    window.location.assign(buildAccountPath('/account/2fa', nextValue));
+    navigateToAccountPath('/account/2fa', nextValue, navigate);
     return true;
   }
 
   if (hasPendingFlow(response, 'verify_email')) {
-    window.location.assign(buildAccountPath('/account/verify-email', nextValue));
+    navigateToAccountPath('/account/verify-email', nextValue, navigate);
     return true;
   }
 

@@ -1,8 +1,8 @@
-import { createFileRoute, type SearchSchemaInput } from '@tanstack/react-router';
+import { createFileRoute, useNavigate, type SearchSchemaInput } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
 import { useAuth } from '../../auth';
-import { buildAccountPath, formatErrors, handleAuthenticationOutcome, redirectToNext, sanitizeNext } from '../../auth-routing';
+import { formatErrors, handleAuthenticationOutcome, navigateToAccountPath, redirectToNext, sanitizeNext } from '../../auth-routing';
 import { AuthCard, ErrorPanel, Field, PageIntro, ProviderButtons, SubmitButton } from '../../auth-ui';
 import { HEADLESS_BROWSER_BASE_PATH } from '../../lib/auth';
 
@@ -15,6 +15,7 @@ export const Route = createFileRoute('/account/signup')({
 
 function SignupPage() {
   const auth = useAuth();
+  const navigate = useNavigate();
   const { next: nextValue } = Route.useSearch();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -26,11 +27,11 @@ function SignupPage() {
 
   useEffect(() => {
     if (!auth.isLoading && auth.isAuthenticated) {
-      redirectToNext(nextValue);
+      redirectToNext(nextValue, navigate);
     }
-  }, [auth.isAuthenticated, auth.isLoading, nextValue]);
+  }, [auth.isAuthenticated, auth.isLoading, navigate, nextValue]);
 
-  if (!auth.accountConfig?.is_open_for_signup) {
+  if (!auth.isLoading && auth.accountConfig?.is_open_for_signup === false) {
     return (
       <AuthCard>
         <PageIntro
@@ -59,12 +60,12 @@ function SignupPage() {
         method: 'POST',
       });
 
-      if (handleAuthenticationOutcome(response, nextValue)) {
+      if (handleAuthenticationOutcome(response, nextValue, navigate)) {
         return;
       }
 
       if (!response.errors) {
-        window.location.assign(buildAccountPath('/account/verify-email', nextValue));
+        navigateToAccountPath('/account/verify-email', nextValue, navigate);
         return;
       }
 

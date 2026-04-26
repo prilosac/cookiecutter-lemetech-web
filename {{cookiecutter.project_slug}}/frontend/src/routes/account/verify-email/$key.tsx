@@ -1,4 +1,4 @@
-import { createFileRoute, type SearchSchemaInput } from '@tanstack/react-router';
+import { createFileRoute, useNavigate, type SearchSchemaInput } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
 import { useAuth } from '../../../auth';
@@ -15,6 +15,7 @@ export const Route = createFileRoute('/account/verify-email/$key')({
 
 function VerifyEmailKeyPage() {
   const auth = useAuth();
+  const navigate = useNavigate();
   const { key } = Route.useParams();
   const { next: nextValue } = Route.useSearch();
   const [errors, setErrors] = useState<string[]>([]);
@@ -68,12 +69,12 @@ function VerifyEmailKeyPage() {
         method: 'POST',
       });
 
-      if (handleAuthenticationOutcome(response, nextValue)) {
+      if (handleAuthenticationOutcome(response, nextValue, navigate)) {
         return;
       }
 
       if (!response.errors) {
-        window.location.assign('/');
+        void navigate({ replace: true, to: '/' });
         return;
       }
 

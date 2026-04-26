@@ -1,9 +1,13 @@
-import { Link, Outlet, createRootRoute } from '@tanstack/react-router';
+import { Link, Outlet, createRootRouteWithContext } from '@tanstack/react-router';
 
-import { useAuth } from '../auth';
+import { routerAuth, useAuth } from '../auth';
 import { collectFlowIds } from '../auth-routing';
 
-export const Route = createRootRoute({ component: AppShell });
+interface RouterContext {
+  auth: typeof routerAuth;
+}
+
+export const Route = createRootRouteWithContext<RouterContext>()({ component: AppShell });
 
 function AppShell() {
   const auth = useAuth();
