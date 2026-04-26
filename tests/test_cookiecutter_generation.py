@@ -1,16 +1,22 @@
-import glob  # noqa: EXE002
+from __future__ import annotations  # noqa: EXE002
+
+import glob
 import os
 import re
 import sys
-from collections.abc import Iterable
+import tomllib
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
 from pathlib import Path
 
 import pytest
-import tomllib
 
 try:
     import sh
-except (ImportError, ModuleNotFoundError):
+except ImportError, ModuleNotFoundError:
     sh = None  # sh doesn't support Windows
 import yaml
 from binaryornot.check import is_binary
@@ -111,7 +117,7 @@ SUPPORTED_COMBINATIONS = [
     {"cloud_provider": "Azure", "mail_service": "Other SMTP"},
     # Note: cloud_providers GCP, Azure, and None
     # with mail_service Amazon SES is not supported
-    {"rest_api": "None"},
+    {"rest_api": "None", "frontend_pipeline": "None"},
     {"rest_api": "DRF"},
     {"rest_api": "Django Ninja"},
     {"use_async": "y"},
@@ -148,7 +154,6 @@ UNSUPPORTED_COMBINATIONS = [
     {"cloud_provider": "GCP", "mail_service": "Amazon SES"},
     {"cloud_provider": "Azure", "mail_service": "Amazon SES"},
     {"cloud_provider": "None", "mail_service": "Amazon SES"},
-    {"frontend_pipeline": "Vite"},
     {"frontend_pipeline": "Vite", "rest_api": "None"},
 ]
 
@@ -232,7 +237,10 @@ def test_django_upgrade_passes(cookies, context_override):
 
     python_files = [
         file_path.removeprefix(f"{result.project_path}/")
-        for file_path in glob.glob(str(result.project_path / "**" / "*.py"), recursive=True)  # noqa: PTH207
+        for file_path in glob.glob(  # noqa: PTH207
+            str(result.project_path / "**" / "*.py"),
+            recursive=True,
+        )
     ]
     try:
         sh.django_upgrade(
@@ -309,7 +317,12 @@ def test_travis_invokes_pytest(cookies, context, use_docker, expected_test_scrip
         ("y", "docker compose -f docker-compose.local.yml run django pytest"),
     ],
 )
-def test_gitlab_invokes_precommit_and_pytest(cookies, context, use_docker, expected_test_script):
+def test_gitlab_invokes_precommit_and_pytest(
+    cookies,
+    context,
+    use_docker,
+    expected_test_script,
+):
     context.update({"ci_tool": "Gitlab", "use_docker": use_docker})
     result = cookies.bake(extra_context=context)
 
@@ -336,7 +349,12 @@ def test_gitlab_invokes_precommit_and_pytest(cookies, context, use_docker, expec
         ("y", "docker compose -f docker-compose.local.yml run django pytest"),
     ],
 )
-def test_github_invokes_linter_and_pytest(cookies, context, use_docker, expected_test_script):
+def test_github_invokes_linter_and_pytest(
+    cookies,
+    context,
+    use_docker,
+    expected_test_script,
+):
     context.update({"ci_tool": "Github", "use_docker": use_docker})
     result = cookies.bake(extra_context=context)
 
@@ -411,7 +429,12 @@ def test_pycharm_docs_removed(cookies, context, editor, pycharm_docs_exist):
         ("Neovim", False),
     ],
 )
-def test_vscode_devcontainer_customizations_removed(tmp_path, context, editor, vscode_customization_exists):
+def test_vscode_devcontainer_customizations_removed(
+    tmp_path,
+    context,
+    editor,
+    vscode_customization_exists,
+):
     context.update({"editor": editor, "use_docker": "y"})
     cookiecutters_dir = tmp_path / "cookiecutters"
     replay_dir = tmp_path / "cookiecutter_replay"
@@ -487,47 +510,31 @@ def test_pyproject_toml(cookies, context):
     assert data["project"]["name"] == context["project_slug"]
 
 
-def test_vite_headless_auth_contract(cookies, context):
+@pytest.fixture
+def vite_headless_baked(cookies, context):
     context.update({"frontend_pipeline": "Vite", "rest_api": "DRF", "use_docker": "n"})
     result = cookies.bake(extra_context=context)
-
     assert result.exit_code == 0
+    return result
 
-    base_settings = (result.project_path / "config" / "settings" / "base.py").read_text()
-    urls = (result.project_path / "config" / "urls.py").read_text()
-    auth_views = (result.project_path / "config" / "auth_views.py").read_text()
-    vite_config = (result.project_path / "frontend" / "vite.config.ts").read_text()
-    auth_routing = (result.project_path / "frontend" / "src" / "auth-routing.ts").read_text()
-    user_adapters = (result.project_path / context["project_slug"] / "users" / "adapters.py").read_text()
-    router = (result.project_path / "frontend" / "src" / "router.tsx").read_text()
-    root_route = result.project_path / "frontend" / "src" / "routes" / "__root.tsx"
-    login_route = result.project_path / "frontend" / "src" / "routes" / "account" / "login.tsx"
-    mfa_route = result.project_path / "frontend" / "src" / "routes" / "account" / "2fa.tsx"
-    logout_route = result.project_path / "frontend" / "src" / "routes" / "account" / "logout.tsx"
-    profile_route = result.project_path / "frontend" / "src" / "routes" / "account" / "profile.tsx"
+
+def test_vite_headless_auth_frontend(vite_headless_baked, context):
+    vite_config = (vite_headless_baked.project_path / "frontend" / "vite.config.ts").read_text()
+    auth_routing = (vite_headless_baked.project_path / "frontend" / "src" / "auth-routing.ts").read_text()
+
+    router = (vite_headless_baked.project_path / "frontend" / "src" / "router.tsx").read_text()
+    root_route = vite_headless_baked.project_path / "frontend" / "src" / "routes" / "__root.tsx"
+    login_route = vite_headless_baked.project_path / "frontend" / "src" / "routes" / "account" / "login.tsx"
+    mfa_route = vite_headless_baked.project_path / "frontend" / "src" / "routes" / "account" / "2fa.tsx"
+    logout_route = vite_headless_baked.project_path / "frontend" / "src" / "routes" / "account" / "logout.tsx"
+    profile_route = vite_headless_baked.project_path / "frontend" / "src" / "routes" / "account" / "profile.tsx"
     provider_callback_route = (
-        result.project_path / "frontend" / "src" / "routes" / "account" / "provider" / "callback.tsx"
+        vite_headless_baked.project_path / "frontend" / "src" / "routes" / "account" / "provider" / "callback.tsx"
     )
-    admin_tests = (result.project_path / context["project_slug"] / "users" / "tests" / "test_admin.py").read_text()
-    generated_readme = (result.project_path / "README.md").read_text()
-
-    assert '"allauth.headless"' in base_settings
-    assert 'HEADLESS_CLIENTS = ("browser",)' in base_settings
-    assert f'HEADLESS_ADAPTER = "{context["project_slug"]}.users.adapters.HeadlessAdapter"' in base_settings
-    assert "HEADLESS_ONLY = True" in base_settings
-    assert '"account_confirm_email": "/account/verify-email/{key}"' in base_settings
-    assert 'LOGIN_URL = "account_login"' in base_settings
-
-    assert 'path("accounts/bootstrap/", spa_auth_bootstrap_view, name="account_spa_bootstrap")' in urls
-    assert 'path("accounts/login/", account_login_redirect_view, name="account_login")' in urls
-    assert 'path("_allauth/", include("allauth.headless.urls"))' in urls
-    assert 'r"^(?!admin/|api/|accounts/|_allauth/|media/|static/|__debug__/).+$"' in urls
-
-    assert "class SPAAuthBootstrapView(View):" in auth_views
-    assert '"csrf_token": get_token(request)' in auth_views
 
     assert "'/accounts': {" in vite_config
     assert "'/_allauth': {" in vite_config
+
     assert "export function hasFlow" in auth_routing
     assert "const DJANGO_OWNED_REDIRECT_PREFIXES = ['/admin/', '/accounts/', '/_allauth/'];" in auth_routing
     assert "window.location.assign(next)" in auth_routing
@@ -539,8 +546,8 @@ def test_vite_headless_auth_contract(cookies, context):
     assert login_route.exists()
     assert logout_route.exists()
     assert profile_route.exists()
-    assert "class HeadlessAdapter(DefaultHeadlessAdapter):" in user_adapters
-    assert 'payload["is_superuser"] = user.is_superuser' in user_adapters
+    assert mfa_route.exists()
+
     assert "createRootRoute" in root_route.read_text()
     assert 'to="/account/profile"' in root_route.read_text()
     assert 'href="/admin/"' not in root_route.read_text()
@@ -558,14 +565,44 @@ def test_vite_headless_auth_contract(cookies, context):
     assert "QRCodeSVG" in profile_route_content
     assert "hasFlow(response, 'reauthenticate')" in profile_route_content
     assert "createFileRoute('/account/provider/callback')" in provider_callback_route.read_text()
+
     assert "import { routeTree } from './routeTree.gen';" in router
     assert "auth: routerAuth" in router
     assert "routeTree," in router
     assert "path: '/account/login'" not in router
 
-    route_files = (result.project_path / "frontend" / "src" / "routes").glob("**/*.tsx")
+    route_files = (vite_headless_baked.project_path / "frontend" / "src" / "routes").glob("**/*.tsx")
     for route_file in route_files:
         assert "window.location.assign" not in route_file.read_text(), route_file
+
+
+def test_vite_headless_auth_backend(vite_headless_baked, context):
+    base_settings = (vite_headless_baked.project_path / "config" / "settings" / "base.py").read_text()
+    urls = (vite_headless_baked.project_path / "config" / "urls.py").read_text()
+    auth_views = (vite_headless_baked.project_path / "config" / "auth_views.py").read_text()
+    user_adapters = (vite_headless_baked.project_path / context["project_slug"] / "users" / "adapters.py").read_text()
+    admin_tests = (
+        vite_headless_baked.project_path / context["project_slug"] / "users" / "tests" / "test_admin.py"
+    ).read_text()
+    generated_readme = (vite_headless_baked.project_path / "README.md").read_text()
+
+    assert '"allauth.headless"' in base_settings
+    assert 'HEADLESS_CLIENTS = ("browser",)' in base_settings
+    assert f'HEADLESS_ADAPTER = "{context["project_slug"]}.users.adapters.HeadlessAdapter"' in base_settings
+    assert "HEADLESS_ONLY = True" in base_settings
+    assert '"account_confirm_email": "/account/verify-email/{key}"' in base_settings
+    assert 'LOGIN_URL = "account_login"' in base_settings
+
+    assert 'path("accounts/bootstrap/", spa_auth_bootstrap_view, name="account_spa_bootstrap")' in urls
+    assert 'path("accounts/login/", account_login_redirect_view, name="account_login")' in urls
+    assert 'path("_allauth/", include("allauth.headless.urls"))' in urls
+    assert 'r"^(?!admin/|api/|accounts/|_allauth/|media/|static/|__debug__/).+$"' in urls
+
+    assert "class SPAAuthBootstrapView(View):" in auth_views
+    assert '"csrf_token": get_token(request)' in auth_views
+
+    assert "class HeadlessAdapter(DefaultHeadlessAdapter):" in user_adapters
+    assert 'payload["is_superuser"] = user.is_superuser' in user_adapters
 
     assert "def test_allauth_login" in admin_tests
     assert "SPA auth surface backed by `allauth.headless`" in generated_readme
