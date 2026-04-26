@@ -1,4 +1,4 @@
-import { Link, createFileRoute, type SearchSchemaInput } from '@tanstack/react-router';
+import { Link, createFileRoute, useNavigate, type SearchSchemaInput } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
 import { useAuth } from '../../auth';
@@ -15,6 +15,7 @@ export const Route = createFileRoute('/account/login')({
 
 function LoginPage() {
   const auth = useAuth();
+  const navigate = useNavigate();
   const { next: nextValue } = Route.useSearch();
   const loginMethod = auth.accountConfig?.login_methods?.includes('email') ? 'email' : 'username';
   const [identifier, setIdentifier] = useState('');
@@ -24,9 +25,9 @@ function LoginPage() {
 
   useEffect(() => {
     if (!auth.isLoading && auth.isAuthenticated) {
-      redirectToNext(nextValue);
+      redirectToNext(nextValue, navigate);
     }
-  }, [auth.isAuthenticated, auth.isLoading, nextValue]);
+  }, [auth.isAuthenticated, auth.isLoading, navigate, nextValue]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -41,7 +42,7 @@ function LoginPage() {
         method: 'POST',
       });
 
-      if (handleAuthenticationOutcome(response, nextValue)) {
+      if (handleAuthenticationOutcome(response, nextValue, navigate)) {
         return;
       }
 

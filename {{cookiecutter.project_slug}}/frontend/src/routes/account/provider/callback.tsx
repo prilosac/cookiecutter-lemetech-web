@@ -1,12 +1,12 @@
-import { createFileRoute, type SearchSchemaInput } from '@tanstack/react-router';
+import { createFileRoute, useNavigate, type SearchSchemaInput } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
 import { useAuth } from '../../../auth';
 import {
-  buildAccountPath,
   formatErrors,
   handleAuthenticationOutcome,
   hasPendingFlow,
+  navigateToAccountPath,
   redirectToNext,
   sanitizeNext,
 } from '../../../auth-routing';
@@ -23,6 +23,7 @@ export const Route = createFileRoute('/account/provider/callback')({
 
 function ProviderCallbackPage() {
   const auth = useAuth();
+  const navigate = useNavigate();
   const { error, next: nextValue } = Route.useSearch();
   const [errors, setErrors] = useState<string[]>(error ? [error.replaceAll('_', ' ')] : []);
   const [isLoadingSignup, setIsLoadingSignup] = useState(false);
@@ -35,9 +36,9 @@ function ProviderCallbackPage() {
 
   useEffect(() => {
     if (!auth.isLoading && auth.isAuthenticated) {
-      redirectToNext(nextValue);
+      redirectToNext(nextValue, navigate);
     }
-  }, [auth.isAuthenticated, auth.isLoading, nextValue]);
+  }, [auth.isAuthenticated, auth.isLoading, navigate, nextValue]);
 
   useEffect(() => {
     let isMounted = true;
@@ -95,12 +96,12 @@ function ProviderCallbackPage() {
         method: 'POST',
       });
 
-      if (handleAuthenticationOutcome(response, nextValue)) {
+      if (handleAuthenticationOutcome(response, nextValue, navigate)) {
         return;
       }
 
       if (!response.errors) {
-        window.location.assign(buildAccountPath('/account/verify-email', nextValue));
+        navigateToAccountPath('/account/verify-email', nextValue, navigate);
         return;
       }
 

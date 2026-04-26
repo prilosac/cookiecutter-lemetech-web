@@ -503,6 +503,7 @@ def test_vite_headless_auth_contract(cookies, context):
     root_route = result.project_path / "frontend" / "src" / "routes" / "__root.tsx"
     login_route = result.project_path / "frontend" / "src" / "routes" / "account" / "login.tsx"
     mfa_route = result.project_path / "frontend" / "src" / "routes" / "account" / "2fa.tsx"
+    logout_route = result.project_path / "frontend" / "src" / "routes" / "account" / "logout.tsx"
     profile_route = result.project_path / "frontend" / "src" / "routes" / "account" / "profile.tsx"
     provider_callback_route = (
         result.project_path / "frontend" / "src" / "routes" / "account" / "provider" / "callback.tsx"
@@ -528,9 +529,15 @@ def test_vite_headless_auth_contract(cookies, context):
     assert "'/accounts': {" in vite_config
     assert "'/_allauth': {" in vite_config
     assert "export function hasFlow" in auth_routing
+    assert "const DJANGO_OWNED_REDIRECT_PREFIXES = ['/admin/', '/accounts/', '/_allauth/'];" in auth_routing
+    assert "window.location.assign(next)" in auth_routing
+    assert "void navigate({ replace: true, to: next })" in auth_routing
+    assert "navigateToAccountPath('/account/2fa', nextValue, navigate)" in auth_routing
+    assert "navigateToAccountPath('/account/verify-email', nextValue, navigate)" in auth_routing
 
     assert root_route.exists()
     assert login_route.exists()
+    assert logout_route.exists()
     assert profile_route.exists()
     assert "class HeadlessAdapter(DefaultHeadlessAdapter):" in user_adapters
     assert 'payload["is_superuser"] = user.is_superuser' in user_adapters
@@ -539,14 +546,26 @@ def test_vite_headless_auth_contract(cookies, context):
     assert 'href="/admin/"' not in root_route.read_text()
     assert "createFileRoute('/account/login')" in login_route.read_text()
     assert "createFileRoute('/account/2fa')" in mfa_route.read_text()
-    assert "createFileRoute('/account/profile')" in profile_route.read_text()
-    assert "auth.user?.is_superuser" in profile_route.read_text()
-    assert "QRCodeSVG" in profile_route.read_text()
-    assert "hasFlow(response, 'reauthenticate')" in profile_route.read_text()
+    assert "throw redirect({ replace: true, to: '/' })" in logout_route.read_text()
+    assert "There is no active session to close" not in logout_route.read_text()
+
+    profile_route_content = profile_route.read_text()
+    assert "createFileRoute('/account/profile')" in profile_route_content
+    assert "await context.auth.waitForReady()" in profile_route_content
+    assert "throw redirect({ replace: true, to: '/' })" in profile_route_content
+    assert "Sign in to manage your account" not in profile_route_content
+    assert "auth.user?.is_superuser" in profile_route_content
+    assert "QRCodeSVG" in profile_route_content
+    assert "hasFlow(response, 'reauthenticate')" in profile_route_content
     assert "createFileRoute('/account/provider/callback')" in provider_callback_route.read_text()
     assert "import { routeTree } from './routeTree.gen';" in router
-    assert "createRouter({ routeTree })" in router
+    assert "auth: routerAuth" in router
+    assert "routeTree," in router
     assert "path: '/account/login'" not in router
+
+    route_files = (result.project_path / "frontend" / "src" / "routes").glob("**/*.tsx")
+    for route_file in route_files:
+        assert "window.location.assign" not in route_file.read_text(), route_file
 
     assert "def test_allauth_login" in admin_tests
     assert "SPA auth surface backed by `allauth.headless`" in generated_readme

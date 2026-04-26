@@ -1,4 +1,4 @@
-import { createFileRoute, type SearchSchemaInput } from '@tanstack/react-router';
+import { createFileRoute, useNavigate, type SearchSchemaInput } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
 import { useAuth } from '../../auth';
@@ -26,6 +26,7 @@ function formatAuthenticatorLabel(type: string) {
 
 function MFAChallengePage() {
   const auth = useAuth();
+  const navigate = useNavigate();
   const { next: nextValue } = Route.useSearch();
   const [code, setCode] = useState('');
   const [errors, setErrors] = useState<string[]>([]);
@@ -37,9 +38,9 @@ function MFAChallengePage() {
 
   useEffect(() => {
     if (!auth.isLoading && auth.isAuthenticated && !pendingMFA && !pendingTrust) {
-      redirectToNext(nextValue);
+      redirectToNext(nextValue, navigate);
     }
-  }, [auth.isAuthenticated, auth.isLoading, nextValue, pendingMFA, pendingTrust]);
+  }, [auth.isAuthenticated, auth.isLoading, navigate, nextValue, pendingMFA, pendingTrust]);
 
   async function handleCodeSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -52,7 +53,7 @@ function MFAChallengePage() {
         method: 'POST',
       });
 
-      if (handleAuthenticationOutcome(response, nextValue)) {
+      if (handleAuthenticationOutcome(response, nextValue, navigate)) {
         return;
       }
 
@@ -73,7 +74,7 @@ function MFAChallengePage() {
         method: 'POST',
       });
 
-      if (handleAuthenticationOutcome(response, nextValue)) {
+      if (handleAuthenticationOutcome(response, nextValue, navigate)) {
         return;
       }
 

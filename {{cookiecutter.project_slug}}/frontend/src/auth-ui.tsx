@@ -2,12 +2,12 @@ import { useAuth } from './auth';
 import { buildAccountPath } from './auth-routing';
 import { HEADLESS_BROWSER_BASE_PATH } from './lib/auth';
 
-export function PageIntro({ eyebrow, title, description }: { description: string; eyebrow: string; title: string }) {
+export function PageIntro({ eyebrow, title, description }: { description?: string; eyebrow: string; title?: string }) {
   return (
     <div className="space-y-3">
       <p className="text-sm font-medium uppercase tracking-[0.3em] text-cyan-300/80">{eyebrow}</p>
-      <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">{title}</h2>
-      <p className="max-w-2xl text-base leading-7 text-slate-300">{description}</p>
+      {title ? <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">{title}</h2> : null}
+      {description ? <p className="max-w-2xl text-base leading-7 text-slate-300">{description}</p> : null}
     </div>
   );
 }
