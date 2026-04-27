@@ -1,9 +1,15 @@
+from __future__ import annotations
+
 import json
 import os
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from github import Github
-from github.NamedUser import NamedUser
+
+if TYPE_CHECKING:
+    from github.NamedUser import NamedUser
+
 from jinja2 import Template
 
 CURRENT_FILE = Path(__file__)

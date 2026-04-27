@@ -42,4 +42,3 @@ Listed in alphabetical order.
   </tr>
   {%- endfor %}
 </table>
-
