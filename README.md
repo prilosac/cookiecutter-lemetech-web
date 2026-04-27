@@ -153,7 +153,6 @@ Answer the prompts with your own desired [options](http://cookiecutter-django.re
     [26/27] keep_local_envs_in_vcs (y):
     [27/27] debug (n):
 
-
 Enter the project and take a look around:
 
     cd reddit/
@@ -167,7 +166,7 @@ Create a git repo and push it there:
     git remote add origin git@github.com:prilosac/redditclone.git
     git push -u origin main
 
-Now take a look at your repo. Don't forget to carefully look at the generated README. If you selected Vite, your React + TypeScript frontend will live in ``frontend/`` and the generated SPA auth routes will live under ``/account/...`` while Django keeps ``/accounts/...`` and ``/_allauth/...``.
+Now take a look at your repo. Don't forget to carefully look at the generated README. If you selected Vite, your React + TypeScript frontend will live in `frontend/` and the generated SPA auth routes will live under `/account/...` while Django keeps `/accounts/...` and `/_allauth/...`.
 
 For local development, see the following. I strongly recommend you use docker, and will likely remove the non-docker path in the future.
 

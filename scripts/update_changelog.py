@@ -1,8 +1,14 @@
+from __future__ import annotations
+
 import datetime as dt
 import os
 import re
 import subprocess
-from collections.abc import Iterable
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
 from pathlib import Path
 
 import git
