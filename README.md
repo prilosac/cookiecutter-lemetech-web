@@ -3,7 +3,6 @@
 [![Build Status](https://img.shields.io/github/actions/workflow/status/prilosac/cookiecutter-lemetech-web/ci.yml?branch=main)](https://github.com/prilosac/cookiecutter-lemetech-web/actions/workflows/ci.yml?query=branch%3Amain)
 [![Documentation Status](https://readthedocs.org/projects/cookiecutter-django/badge/?version=latest)](https://cookiecutter-django.readthedocs.io/en/latest/?badge=latest)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
-
 [![Updates](https://pyup.io/repos/github/cookiecutter/cookiecutter-django/shield.svg)](https://pyup.io/repos/github/cookiecutter/cookiecutter-django/)
 [![Join our Discord](https://img.shields.io/badge/Discord-cookiecutter-5865F2?style=flat&logo=discord&logoColor=white)](https://discord.gg/rAWFUP47d2)
 

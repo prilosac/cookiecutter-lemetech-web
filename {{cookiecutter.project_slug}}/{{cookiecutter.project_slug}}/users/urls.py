@@ -1,6 +1,8 @@
 {%- if cookiecutter.frontend_pipeline == 'Vite' %}
+from django.urls import URLPattern
+
 app_name = "users"
-urlpatterns = []
+urlpatterns: list[URLPattern] = []
 {%- else %}
 from django.urls import path
 
