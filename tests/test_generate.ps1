@@ -10,7 +10,7 @@ Set-Location .cache/bare
 
 # create the project using the default settings in cookiecutter.json
 Invoke-Expression "uv run cookiecutter ../../ --no-input --overwrite-if-exists use_docker=n $env:COOKIECUTTER_ARGS"
-Set-Location my_awesome_project
+Set-Location leme_tech_project
 
 # Install Python deps
 # uv sync
