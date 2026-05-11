@@ -35,10 +35,10 @@ jobs:
       fail-fast: false
       matrix:
         script:
-          - name: Basic
+          - name: Default Vite
             args: "ci_tool=Gitlab"
-          - name: Celery & DRF
-            args: "use_celery=y rest_api=DRF"
+          - name: Django Ninja
+            args: "rest_api='Django Ninja'"
           - name: Gulp
             args: "frontend_pipeline=Gulp"
           - name: Webpack
