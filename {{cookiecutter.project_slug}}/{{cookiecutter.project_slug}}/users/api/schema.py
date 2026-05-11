@@ -5,6 +5,11 @@ from {{ cookiecutter.project_slug }}.users.models import User
 
 
 class UpdateUserSchema(ModelSchema):
+    name: str
+    {%- if cookiecutter.username_type == "username" %}
+    username: str
+    {%- endif %}
+
     class Meta:
         model = User
         {%- if cookiecutter.username_type == "email" %}
