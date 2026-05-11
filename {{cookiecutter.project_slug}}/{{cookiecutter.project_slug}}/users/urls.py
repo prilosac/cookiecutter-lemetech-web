@@ -1,5 +1,8 @@
 {%- if cookiecutter.frontend_pipeline == 'Vite' %}
-from django.urls import URLPattern
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from django.urls import URLPattern
 
 app_name = "users"
 urlpatterns: list[URLPattern] = []
