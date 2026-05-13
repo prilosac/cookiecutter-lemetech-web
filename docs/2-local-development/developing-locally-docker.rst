@@ -90,7 +90,7 @@ To run the docs with local services just use::
 
     docker compose -f docker-compose.local.yml -f docker-compose.docs.yml up
 
-The site should start and be accessible at http://localhost:3000 if you selected Webpack or Gulp as frontend pipeline and http://localhost:8000 otherwise.
+The site should start and be accessible at http://localhost:5173 if you selected Vite as frontend pipeline, http://localhost:3000 if you selected Webpack or Gulp, and http://localhost:8000 otherwise.
 
 Execute Management Commands
 ---------------------------
@@ -249,6 +249,14 @@ Prerequisites:
 By default, it's enabled both in local and production environments (``docker-compose.local.yml`` and ``docker-compose.production.yml`` Docker Compose configs, respectively) through a ``flower`` service. For added security, ``flower`` requires its clients to provide authentication credentials specified as the corresponding environments' ``.envs/.local/.django`` and ``.envs/.production/.django`` ``CELERY_FLOWER_USER`` and ``CELERY_FLOWER_PASSWORD`` environment variables. Check out ``localhost:5555`` and see for yourself.
 
 .. _`Flower`: https://github.com/mher/flower
+
+Using Vite
+~~~~~~~~~~
+
+If you've opted for Vite as front-end pipeline, the stack includes a dedicated ``node`` service that runs the Vite dev server from ``frontend/``.
+
+Use ``http://localhost:5173`` for frontend development. The Vite server proxies backend requests to the Django container so API, admin, static, media, and debug-toolbar routes stay on the same origin during development.
+
 
 Using Webpack or Gulp
 ~~~~~~~~~~~~~~~~~~~~~

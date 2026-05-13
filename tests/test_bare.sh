@@ -1,5 +1,5 @@
 #!/bin/sh
-# this is a very simple script that tests the docker configuration for cookiecutter-django
+# this is a very simple script that tests the docker configuration for cookiecutter-lemetech-web
 # it is meant to be run from the root directory of the repository, eg:
 # sh tests/test_bare.sh
 
@@ -12,7 +12,7 @@ cd .cache/bare
 
 # create the project using the default settings in cookiecutter.json
 uv run cookiecutter ../../ --no-input --overwrite-if-exists use_docker=n "$@"
-cd my_awesome_project
+cd leme_tech_project
 
 # Install OS deps
 sudo utility/install_os_dependencies.sh install
@@ -26,8 +26,14 @@ uv run pytest
 # Make sure the check doesn't raise any warnings
 uv run python manage.py check --fail-level WARNING
 
-# Run npm build script if package.json is present
-if [ -f "package.json" ]
+# Run npm build script if frontend/package.json or package.json is present
+if [ -f "frontend/package.json" ]
+then
+    cd frontend
+    npm install
+    npm run build
+    cd ..
+elif [ -f "package.json" ]
 then
     npm install
     npm run build

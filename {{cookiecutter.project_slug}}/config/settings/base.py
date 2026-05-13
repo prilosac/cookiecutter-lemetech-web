@@ -2,6 +2,7 @@
 """Base settings to build other settings files upon."""
 {% if cookiecutter.use_celery == 'y' %}
 import ssl
+
 {%- endif %}
 from pathlib import Path
 
@@ -11,6 +12,7 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 # {{ cookiecutter.project_slug }}/
 APPS_DIR = BASE_DIR / "{{ cookiecutter.project_slug }}"
 env = environ.Env()
+FRONTEND_PIPELINE = "{{ cookiecutter.frontend_pipeline }}"
 
 READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=False)
 if READ_DOT_ENV_FILE:
@@ -86,6 +88,9 @@ THIRD_PARTY_APPS = [
     "crispy_bootstrap5",
     "allauth",
     "allauth.account",
+{%- if cookiecutter.frontend_pipeline == 'Vite' %}
+    "allauth.headless",
+{%- endif %}
     "allauth.mfa",
     "allauth.socialaccount",
 {%- if cookiecutter.use_celery == 'y' %}
@@ -126,7 +131,11 @@ AUTHENTICATION_BACKENDS = [
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-user-model
 AUTH_USER_MODEL = "users.User"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
+{%- if cookiecutter.frontend_pipeline == 'Vite' %}
+LOGIN_REDIRECT_URL = "home"
+{%- else %}
 LOGIN_REDIRECT_URL = "users:redirect"
+{%- endif %}
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-url
 LOGIN_URL = "account_login"
 
@@ -179,6 +188,14 @@ STATIC_ROOT = str(BASE_DIR / "staticfiles")
 STATIC_URL = "/static/"
 # https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
 STATICFILES_DIRS = [str(APPS_DIR / "static")]
+{%- if cookiecutter.frontend_pipeline == 'Vite' %}
+VITE_DEV_SERVER_URL = env("VITE_DEV_SERVER_URL", default="http://localhost:5173")
+VITE_MANIFEST_ENTRY = "index.html"
+VITE_MANIFEST_PATH = BASE_DIR / "frontend" / "dist" / "manifest.json"
+vite_dist_dir = VITE_MANIFEST_PATH.parent
+if vite_dist_dir.exists():
+    STATICFILES_DIRS.append(str(vite_dist_dir))
+{%- endif %}
 # https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
 STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
@@ -347,6 +364,7 @@ ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 {%- endif %}
 # https://docs.allauth.org/en/latest/account/configuration.html
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 # https://docs.allauth.org/en/latest/account/configuration.html
 ACCOUNT_ADAPTER = "{{cookiecutter.project_slug}}.users.adapters.AccountAdapter"
 # https://docs.allauth.org/en/latest/account/forms.html
@@ -355,6 +373,18 @@ ACCOUNT_FORMS = {"signup": "{{cookiecutter.project_slug}}.users.forms.UserSignup
 SOCIALACCOUNT_ADAPTER = "{{cookiecutter.project_slug}}.users.adapters.SocialAccountAdapter"
 # https://docs.allauth.org/en/latest/socialaccount/configuration.html
 SOCIALACCOUNT_FORMS = {"signup": "{{cookiecutter.project_slug}}.users.forms.UserSocialSignupForm"}
+{%- if cookiecutter.frontend_pipeline == 'Vite' %}
+HEADLESS_CLIENTS = ("browser",)
+HEADLESS_ADAPTER = "{{cookiecutter.project_slug}}.users.adapters.HeadlessAdapter"
+HEADLESS_ONLY = True
+HEADLESS_FRONTEND_URLS = {
+    "account_signup": "/account/signup",
+    "account_confirm_email": "/account/verify-email/{key}",
+    "account_reset_password": "/account/password/reset",
+    "account_reset_password_from_key": "/account/password/reset/key/{key}",
+    "socialaccount_login_error": "/account/provider/callback",
+}
+{%- endif %}
 {% if cookiecutter.frontend_pipeline == 'Django Compressor' -%}
 # django-compressor
 # ------------------------------------------------------------------------------

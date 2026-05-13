@@ -96,7 +96,7 @@ services:
     command: /start-flower
 
   {%- endif %}
-  {%- if cookiecutter.frontend_pipeline in ['Gulp', 'Webpack'] %}
+  {%- if cookiecutter.frontend_pipeline in ['Gulp', 'Webpack', 'Vite'] %}
 
   node:
     build:
@@ -109,10 +109,18 @@ services:
     volumes:
       - .:/app:z
       # http://jdlm.info/articles/2016/03/06/lessons-building-node-app-docker.html
+      {%- if cookiecutter.frontend_pipeline == 'Vite' %}
+      - /app/frontend/node_modules
+      {%- else %}
       - /app/node_modules
+      {%- endif %}
     command: npm run dev
     ports:
+      {%- if cookiecutter.frontend_pipeline == 'Vite' %}
+      - '5173:5173'
+      {%- else %}
       - '3000:3000'
+      {%- endif %}
       {%- if cookiecutter.frontend_pipeline == 'Gulp' %}
       # Expose browsersync UI: https://www.browsersync.io/docs/options/#option-ui
       - '3001:3001'

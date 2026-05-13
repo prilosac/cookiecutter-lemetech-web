@@ -6,29 +6,55 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 {%- endif %}
 from django.urls import include
 from django.urls import path
+{%- if cookiecutter.frontend_pipeline == 'Vite' %}
+from django.urls import re_path
+{%- endif %}
 from django.views import defaults as default_views
+{%- if cookiecutter.frontend_pipeline != 'Vite' %}
 from django.views.generic import TemplateView
+{%- endif %}
 {%- if cookiecutter.rest_api == 'DRF' %}
 from drf_spectacular.views import SpectacularAPIView
 from drf_spectacular.views import SpectacularSwaggerView
 from rest_framework.authtoken.views import obtain_auth_token
 {%- elif cookiecutter.rest_api == 'Django Ninja' %}
-
-from .api import api
 {%- endif %}
-
+{% if cookiecutter.rest_api == 'Django Ninja' or cookiecutter.frontend_pipeline == 'Vite' %}
+{% if cookiecutter.rest_api == 'Django Ninja' -%}
+from .api import api
+{% endif -%}
+{% if cookiecutter.frontend_pipeline == 'Vite' -%}
+from .auth_views import account_login_redirect_view
+from .auth_views import account_signup_redirect_view
+from .auth_views import spa_auth_bootstrap_view
+from .views import SpaView
+{% endif -%}
+{% endif %}
 urlpatterns = [
+    {%- if cookiecutter.frontend_pipeline == 'Vite' %}
+    path("", SpaView.as_view(), name="home"),
+    {%- else %}
     path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
     path(
         "about/",
         TemplateView.as_view(template_name="pages/about.html"),
         name="about",
     ),
+    {%- endif %}
     # Django Admin, use {% raw %}{% url 'admin:index' %}{% endraw %}
     path(settings.ADMIN_URL, admin.site.urls),
+    {%- if cookiecutter.frontend_pipeline == 'Vite' %}
+    path("accounts/bootstrap/", spa_auth_bootstrap_view, name="account_spa_bootstrap"),
+    path("accounts/login/", account_login_redirect_view, name="account_login"),
+    path("accounts/signup/", account_signup_redirect_view, name="account_signup"),
+    path("accounts/", include("allauth.urls")),
+    path("_allauth/", include("allauth.headless.urls")),
+    {%- endif %}
+    {%- if cookiecutter.frontend_pipeline != 'Vite' %}
     # User management
     path("users/", include("{{ cookiecutter.project_slug }}.users.urls", namespace="users")),
     path("accounts/", include("allauth.urls")),
+    {%- endif %}
     # Your stuff: custom urls includes go here
     # ...
     # Media files
@@ -90,3 +116,13 @@ if settings.DEBUG:
             path("__debug__/", include(debug_toolbar.urls)),
             *urlpatterns,
         ]
+
+{%- if cookiecutter.frontend_pipeline == 'Vite' %}
+urlpatterns += [
+    re_path(
+        r"^(?!admin/|api/|accounts/|_allauth/|media/|static/|__debug__/).+$",
+        SpaView.as_view(),
+        name="spa",
+    ),
+]
+{%- endif %}

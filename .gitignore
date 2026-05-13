@@ -214,4 +214,9 @@ tags
 # is declarative by nature.
 .idea/
 
+# Node things
+node_modules/
+
 .pytest_cache/
+.pytest-tmp/
+.opencode

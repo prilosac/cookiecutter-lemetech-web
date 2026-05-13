@@ -116,6 +116,30 @@ def remove_project_css():
         project_css_path.unlink()
 
 
+def remove_project_js():
+    project_js_path = Path("{{ cookiecutter.project_slug }}", "static", "js", "project.js")
+    if project_js_path.exists():
+        project_js_path.unlink()
+
+
+def remove_frontend_dir():
+    frontend_dir = Path("frontend")
+    if frontend_dir.exists():
+        shutil.rmtree(frontend_dir)
+
+
+def remove_public_frontend_templates():
+    templates_dir = Path("{{ cookiecutter.project_slug }}", "templates")
+    pages_dir = templates_dir / "pages"
+    users_dir = templates_dir / "users"
+
+    if pages_dir.exists():
+        shutil.rmtree(pages_dir)
+
+    if users_dir.exists():
+        shutil.rmtree(users_dir)
+
+
 def remove_packagejson_file():
     file_names = ["package.json"]
     for file_name in file_names:
@@ -253,7 +277,7 @@ def remove_dotdrone_file():
     Path(".drone.yml").unlink()
 
 
-def generate_random_string(length, using_digits=False, using_ascii_letters=False, using_punctuation=False):  # noqa: FBT002
+def generate_random_string(length, *, using_digits=False, using_ascii_letters=False, using_punctuation=False):
     """
     Example:
         opting out for 50 symbol-long, [a-z][A-Z][0-9] string
@@ -473,7 +497,16 @@ def main():  # noqa: C901, PLR0912, PLR0915
         if "{{ cookiecutter.keep_local_envs_in_vcs }}".lower() == "y":
             append_to_gitignore_file("!.envs/.local/")
 
-    if "{{ cookiecutter.frontend_pipeline }}" in ["None", "Django Compressor"]:
+    if "{{ cookiecutter.frontend_pipeline }}" == "Vite":
+        remove_gulp_files()
+        remove_webpack_files()
+        remove_sass_files()
+        remove_packagejson_file()
+        remove_project_css()
+        remove_project_js()
+        remove_public_frontend_templates()
+    elif "{{ cookiecutter.frontend_pipeline }}" in ["None", "Django Compressor"]:
+        remove_frontend_dir()
         remove_gulp_files()
         remove_webpack_files()
         remove_sass_files()
@@ -482,6 +515,7 @@ def main():  # noqa: C901, PLR0912, PLR0915
         if "{{ cookiecutter.use_docker }}".lower() == "y":
             remove_node_dockerfile()
     else:
+        remove_frontend_dir()
         remove_project_css()
         handle_js_runner(
             "{{ cookiecutter.frontend_pipeline }}",
@@ -533,7 +567,7 @@ def setup_dependencies():
     if "{{ cookiecutter.use_docker }}".lower() == "y":
         # Build a trimmed down Docker image add dependencies with uv
         uv_docker_image_path = Path("compose/local/uv/Dockerfile")
-        uv_image_tag = "cookiecutter-django-uv-runner:latest"
+        uv_image_tag = "cookiecutter-lemetech-web-uv-runner:latest"
         try:
             subprocess.run(  # noqa: S603
                 [  # noqa: S607
@@ -559,21 +593,35 @@ def setup_dependencies():
 
         current_path = Path.cwd().absolute()
         # Use Docker to run the uv command
-        uv_cmd = ["docker", "run", "--rm", "-v", f"{current_path}:/app", uv_image_tag, "uv"]
+        uv_cmd = [
+            "docker",
+            "run",
+            "--rm",
+            "-v",
+            f"{current_path}:/app",
+            uv_image_tag,
+            "uv",
+        ]
     else:
         # Use uv command directly
         uv_cmd = ["uv"]
 
     # Install production dependencies
     try:
-        subprocess.run([*uv_cmd, "add", "--no-sync", "-r", "requirements/production.txt"], check=True)  # noqa: S603
+        subprocess.run(  # noqa: S603
+            [*uv_cmd, "add", "--no-sync", "-r", "requirements/production.txt"],
+            check=True,
+        )
     except subprocess.CalledProcessError as e:
         print(f"Error installing production dependencies: {e}", file=sys.stderr)
         sys.exit(1)
 
     # Install local (development) dependencies
     try:
-        subprocess.run([*uv_cmd, "add", "--no-sync", "--dev", "-r", "requirements/local.txt"], check=True)  # noqa: S603
+        subprocess.run(  # noqa: S603
+            [*uv_cmd, "add", "--no-sync", "--dev", "-r", "requirements/local.txt"],
+            check=True,
+        )
     except subprocess.CalledProcessError as e:
         print(f"Error installing local dependencies: {e}", file=sys.stderr)
         sys.exit(1)

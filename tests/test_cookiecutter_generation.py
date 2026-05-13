@@ -1,20 +1,27 @@
-import glob  # noqa: EXE002
+from __future__ import annotations  # noqa: EXE002
+
+import glob
 import os
 import re
 import sys
-from collections.abc import Iterable
+import tomllib
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
 from pathlib import Path
 
 import pytest
-import tomllib
 
 try:
     import sh
-except (ImportError, ModuleNotFoundError):
+except ImportError, ModuleNotFoundError:
     sh = None  # sh doesn't support Windows
 import yaml
 from binaryornot.check import is_binary
 from cookiecutter.exceptions import FailedHookException
+from cookiecutter.main import cookiecutter
 
 PATTERN = r"{{(\s?cookiecutter)[.](.*?)}}"
 RE_OBJ = re.compile(PATTERN)
@@ -58,6 +65,7 @@ SUPPORTED_COMBINATIONS = [
     # Windows without Docker and with django-compressor
     {"windows": "y", "frontend_pipeline": "Django Compressor", "use_docker": "n"},
     {"editor": "None"},
+    {"editor": "Neovim"},
     {"editor": "PyCharm"},
     {"editor": "VS Code"},
     {"use_docker": "y"},
@@ -69,10 +77,10 @@ SUPPORTED_COMBINATIONS = [
     {"postgresql_version": "14"},
     {"cloud_provider": "AWS", "use_whitenoise": "y"},
     {"cloud_provider": "AWS", "use_whitenoise": "n"},
-    {"cloud_provider": "GCP", "use_whitenoise": "y"},
-    {"cloud_provider": "GCP", "use_whitenoise": "n"},
-    {"cloud_provider": "Azure", "use_whitenoise": "y"},
-    {"cloud_provider": "Azure", "use_whitenoise": "n"},
+    {"cloud_provider": "GCP", "use_whitenoise": "y", "mail_service": "Mailgun"},
+    {"cloud_provider": "GCP", "use_whitenoise": "n", "mail_service": "Mailgun"},
+    {"cloud_provider": "Azure", "use_whitenoise": "y", "mail_service": "Mailgun"},
+    {"cloud_provider": "Azure", "use_whitenoise": "n", "mail_service": "Mailgun"},
     {"cloud_provider": "None", "use_whitenoise": "y", "mail_service": "Mailgun"},
     {"cloud_provider": "None", "use_whitenoise": "y", "mail_service": "Mailjet"},
     {"cloud_provider": "None", "use_whitenoise": "y", "mail_service": "Mandrill"},
@@ -109,12 +117,14 @@ SUPPORTED_COMBINATIONS = [
     {"cloud_provider": "Azure", "mail_service": "Other SMTP"},
     # Note: cloud_providers GCP, Azure, and None
     # with mail_service Amazon SES is not supported
-    {"rest_api": "None"},
+    {"rest_api": "None", "frontend_pipeline": "None"},
     {"rest_api": "DRF"},
     {"rest_api": "Django Ninja"},
     {"use_async": "y"},
     {"use_async": "n"},
     {"frontend_pipeline": "None"},
+    {"frontend_pipeline": "Vite", "rest_api": "DRF"},
+    {"frontend_pipeline": "Vite", "rest_api": "Django Ninja"},
     {"frontend_pipeline": "Django Compressor"},
     {"frontend_pipeline": "Gulp"},
     {"frontend_pipeline": "Webpack"},
@@ -129,9 +139,9 @@ SUPPORTED_COMBINATIONS = [
     {"use_heroku": "y"},
     {"use_heroku": "n"},
     {"ci_tool": "None"},
+    {"ci_tool": "Github"},
     {"ci_tool": "Travis"},
     {"ci_tool": "Gitlab"},
-    {"ci_tool": "Github"},
     {"ci_tool": "Drone"},
     {"keep_local_envs_in_vcs": "y"},
     {"keep_local_envs_in_vcs": "n"},
@@ -144,6 +154,7 @@ UNSUPPORTED_COMBINATIONS = [
     {"cloud_provider": "GCP", "mail_service": "Amazon SES"},
     {"cloud_provider": "Azure", "mail_service": "Amazon SES"},
     {"cloud_provider": "None", "mail_service": "Amazon SES"},
+    {"frontend_pipeline": "Vite", "rest_api": "None"},
 ]
 
 
@@ -226,7 +237,10 @@ def test_django_upgrade_passes(cookies, context_override):
 
     python_files = [
         file_path.removeprefix(f"{result.project_path}/")
-        for file_path in glob.glob(str(result.project_path / "**" / "*.py"), recursive=True)  # noqa: PTH207
+        for file_path in glob.glob(  # noqa: PTH207
+            str(result.project_path / "**" / "*.py"),
+            recursive=True,
+        )
     ]
     try:
         sh.django_upgrade(
@@ -303,7 +317,12 @@ def test_travis_invokes_pytest(cookies, context, use_docker, expected_test_scrip
         ("y", "docker compose -f docker-compose.local.yml run django pytest"),
     ],
 )
-def test_gitlab_invokes_precommit_and_pytest(cookies, context, use_docker, expected_test_script):
+def test_gitlab_invokes_precommit_and_pytest(
+    cookies,
+    context,
+    use_docker,
+    expected_test_script,
+):
     context.update({"ci_tool": "Gitlab", "use_docker": use_docker})
     result = cookies.bake(extra_context=context)
 
@@ -330,7 +349,12 @@ def test_gitlab_invokes_precommit_and_pytest(cookies, context, use_docker, expec
         ("y", "docker compose -f docker-compose.local.yml run django pytest"),
     ],
 )
-def test_github_invokes_linter_and_pytest(cookies, context, use_docker, expected_test_script):
+def test_github_invokes_linter_and_pytest(
+    cookies,
+    context,
+    use_docker,
+    expected_test_script,
+):
     context.update({"ci_tool": "Github", "use_docker": use_docker})
     result = cookies.bake(extra_context=context)
 
@@ -384,6 +408,7 @@ def test_error_if_incompatible(cookies, context, invalid_context):
         ("None", False),
         ("PyCharm", True),
         ("VS Code", False),
+        ("Neovim", False),
     ],
 )
 def test_pycharm_docs_removed(cookies, context, editor, pycharm_docs_exist):
@@ -393,6 +418,52 @@ def test_pycharm_docs_removed(cookies, context, editor, pycharm_docs_exist):
     index_rst = result.project_path / "docs" / "index.rst"
     has_pycharm_docs = "pycharm/configuration" in index_rst.read_text()
     assert has_pycharm_docs is pycharm_docs_exist
+
+
+@pytest.mark.parametrize(
+    ("editor", "vscode_customization_exists"),
+    [
+        ("None", False),
+        ("PyCharm", False),
+        ("VS Code", True),
+        ("Neovim", False),
+    ],
+)
+def test_vscode_devcontainer_customizations_removed(
+    tmp_path,
+    context,
+    editor,
+    vscode_customization_exists,
+):
+    context.update({"editor": editor, "use_docker": "y"})
+    cookiecutters_dir = tmp_path / "cookiecutters"
+    replay_dir = tmp_path / "cookiecutter_replay"
+    cookiecutters_dir.mkdir()
+    replay_dir.mkdir()
+    config_file = tmp_path / "cookiecutter_config.yaml"
+    config_file.write_text(
+        yaml.safe_dump(
+            {
+                "cookiecutters_dir": str(cookiecutters_dir),
+                "replay_dir": str(replay_dir),
+            },
+        ),
+    )
+
+    project_path = Path(
+        cookiecutter(
+            ".",
+            no_input=True,
+            extra_context=context,
+            output_dir=str(tmp_path),
+            config_file=str(config_file),
+            accept_hooks=False,
+        ),
+    )
+
+    devcontainer_json = project_path / ".devcontainer" / "devcontainer.json"
+    has_vscode_customization = '"vscode"' in devcontainer_json.read_text()
+    assert has_vscode_customization is vscode_customization_exists
 
 
 def test_trim_domain_email(cookies, context):
@@ -437,6 +508,105 @@ def test_pyproject_toml(cookies, context):
     assert data["project"]["authors"][0]["email"] == author_email
     assert data["project"]["authors"][0]["name"] == author_name
     assert data["project"]["name"] == context["project_slug"]
+
+
+@pytest.fixture
+def vite_headless_baked(cookies, context):
+    context.update({"frontend_pipeline": "Vite", "rest_api": "DRF", "use_docker": "n"})
+    result = cookies.bake(extra_context=context)
+    assert result.exit_code == 0
+    return result
+
+
+def test_vite_headless_auth_frontend(vite_headless_baked, context):
+    vite_config = (vite_headless_baked.project_path / "frontend" / "vite.config.ts").read_text()
+    auth_routing = (vite_headless_baked.project_path / "frontend" / "src" / "auth-routing.ts").read_text()
+
+    router = (vite_headless_baked.project_path / "frontend" / "src" / "router.tsx").read_text()
+    root_route = vite_headless_baked.project_path / "frontend" / "src" / "routes" / "__root.tsx"
+    login_route = vite_headless_baked.project_path / "frontend" / "src" / "routes" / "account" / "login.tsx"
+    mfa_route = vite_headless_baked.project_path / "frontend" / "src" / "routes" / "account" / "2fa.tsx"
+    logout_route = vite_headless_baked.project_path / "frontend" / "src" / "routes" / "account" / "logout.tsx"
+    profile_route = vite_headless_baked.project_path / "frontend" / "src" / "routes" / "account" / "profile.tsx"
+    provider_callback_route = (
+        vite_headless_baked.project_path / "frontend" / "src" / "routes" / "account" / "provider" / "callback.tsx"
+    )
+
+    assert "'/accounts': {" in vite_config
+    assert "'/_allauth': {" in vite_config
+
+    assert "export function hasFlow" in auth_routing
+    assert "const DJANGO_OWNED_REDIRECT_PREFIXES = ['/admin/', '/accounts/', '/_allauth/'];" in auth_routing
+    assert "window.location.assign(next)" in auth_routing
+    assert "void navigate({ replace: true, to: next })" in auth_routing
+    assert "navigateToAccountPath('/account/2fa', nextValue, navigate)" in auth_routing
+    assert "navigateToAccountPath('/account/verify-email', nextValue, navigate)" in auth_routing
+
+    assert root_route.exists()
+    assert login_route.exists()
+    assert logout_route.exists()
+    assert profile_route.exists()
+    assert mfa_route.exists()
+
+    assert "createRootRoute" in root_route.read_text()
+    assert 'to="/account/profile"' in root_route.read_text()
+    assert 'href="/admin/"' not in root_route.read_text()
+    assert "createFileRoute('/account/login')" in login_route.read_text()
+    assert "createFileRoute('/account/2fa')" in mfa_route.read_text()
+    assert "throw redirect({ replace: true, to: '/' })" in logout_route.read_text()
+    assert "There is no active session to close" not in logout_route.read_text()
+
+    profile_route_content = profile_route.read_text()
+    assert "createFileRoute('/account/profile')" in profile_route_content
+    assert "await context.auth.waitForReady()" in profile_route_content
+    assert "throw redirect({ replace: true, to: '/' })" in profile_route_content
+    assert "Sign in to manage your account" not in profile_route_content
+    assert "auth.user?.is_superuser" in profile_route_content
+    assert "QRCodeSVG" in profile_route_content
+    assert "hasFlow(response, 'reauthenticate')" in profile_route_content
+    assert "createFileRoute('/account/provider/callback')" in provider_callback_route.read_text()
+
+    assert "import { routeTree } from './routeTree.gen';" in router
+    assert "auth: routerAuth" in router
+    assert "routeTree," in router
+    assert "path: '/account/login'" not in router
+
+    route_files = (vite_headless_baked.project_path / "frontend" / "src" / "routes").glob("**/*.tsx")
+    for route_file in route_files:
+        assert "window.location.assign" not in route_file.read_text(), route_file
+
+
+def test_vite_headless_auth_backend(vite_headless_baked, context):
+    base_settings = (vite_headless_baked.project_path / "config" / "settings" / "base.py").read_text()
+    urls = (vite_headless_baked.project_path / "config" / "urls.py").read_text()
+    auth_views = (vite_headless_baked.project_path / "config" / "auth_views.py").read_text()
+    user_adapters = (vite_headless_baked.project_path / context["project_slug"] / "users" / "adapters.py").read_text()
+    admin_tests = (
+        vite_headless_baked.project_path / context["project_slug"] / "users" / "tests" / "test_admin.py"
+    ).read_text()
+    generated_readme = (vite_headless_baked.project_path / "README.md").read_text()
+
+    assert '"allauth.headless"' in base_settings
+    assert 'HEADLESS_CLIENTS = ("browser",)' in base_settings
+    assert f'HEADLESS_ADAPTER = "{context["project_slug"]}.users.adapters.HeadlessAdapter"' in base_settings
+    assert "HEADLESS_ONLY = True" in base_settings
+    assert '"account_confirm_email": "/account/verify-email/{key}"' in base_settings
+    assert 'LOGIN_URL = "account_login"' in base_settings
+
+    assert 'path("accounts/bootstrap/", spa_auth_bootstrap_view, name="account_spa_bootstrap")' in urls
+    assert 'path("accounts/login/", account_login_redirect_view, name="account_login")' in urls
+    assert 'path("_allauth/", include("allauth.headless.urls"))' in urls
+    assert 'r"^(?!admin/|api/|accounts/|_allauth/|media/|static/|__debug__/).+$"' in urls
+
+    assert "class SPAAuthBootstrapView(View):" in auth_views
+    assert '"csrf_token": get_token(request)' in auth_views
+
+    assert "class HeadlessAdapter(DefaultHeadlessAdapter):" in user_adapters
+    assert 'payload["is_superuser"] = user.is_superuser' in user_adapters
+
+    assert "def test_allauth_login" in admin_tests
+    assert "SPA auth surface backed by `allauth.headless`" in generated_readme
+    assert "intentionally left for a follow-up change" not in generated_readme
 
 
 def test_pre_commit_without_heroku(cookies, context):

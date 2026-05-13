@@ -57,8 +57,9 @@ editor:
     Select an editor to use. The choices are:
 
     1. None
-    2. PyCharm_
+    2. Neovim_
     3. `VS Code`_
+    4. PyCharm_
 
 use_docker:
     Indicates whether the project should be configured to use Docker_, `Docker Compose`_ and `devcontainer`_.
@@ -85,8 +86,8 @@ cloud_provider:
 mail_service:
     Select an email service that Django-Anymail provides
 
-    1. Mailgun_
-    2. `Amazon SES`_
+    1. `Amazon SES`_
+    2. Mailgun_
     3. Mailjet_
     4. Mandrill_
     5. Postmark_
@@ -102,6 +103,8 @@ rest_api:
     2. `Django Rest Framework`_
     3. `Django Ninja`_
 
+    ``Vite`` requires either ``Django Rest Framework`` or ``Django Ninja``.
+
 use_async:
     Indicates whether the project should use web sockets with Uvicorn + Gunicorn.
 
@@ -109,9 +112,12 @@ frontend_pipeline:
     Select a pipeline to compile and optimise frontend assets (JS, CSS, ...):
 
     1. None
-    2. `Django Compressor`_
-    3. `Gulp`_
-    4. `Webpack`_
+    2. Vite
+    3. `Django Compressor`_
+    4. `Gulp`_
+    5. `Webpack`_
+
+    ``Vite`` generates a separate React + TypeScript frontend in ``frontend/`` with Tailwind CSS and TanStack Router.
 
 Both Gulp and Webpack support Bootstrap recompilation with real-time variables alteration.
 
@@ -135,9 +141,9 @@ ci_tool:
     Select a CI tool for running tests. The choices are:
 
     1. None
-    2. `Travis CI`_
-    3. `Gitlab CI`_
-    4. `Github Actions`_
+    2. `GitHub Actions`_
+    3. `Travis CI`_
+    4. `Gitlab CI`_
     5. `Drone CI`_
 
 keep_local_envs_in_vcs:
@@ -146,7 +152,7 @@ Indicates whether the project’s .envs/.local/ should be kept in VCS (comes in 
 
 debug:
     Indicates whether the project should be configured for debugging.
-    This option is relevant for Cookiecutter Django developers only.
+    This option is relevant for Cookiecutter Leme Tech Web developers only.
 
 
 .. _MIT: https://opensource.org/licenses/MIT
@@ -156,6 +162,7 @@ debug:
 
 .. _PyCharm: https://www.jetbrains.com/pycharm/
 .. _VS Code: https://github.com/microsoft/vscode
+.. _Neovim: https://neovim.io/
 
 .. _Docker: https://github.com/docker/docker
 .. _Docker Compose: https://docs.docker.com/compose/
@@ -201,4 +208,4 @@ debug:
 
 .. _Drone CI: https://docs.drone.io/pipeline/overview/
 
-.. _Github Actions: https://docs.github.com/en/actions
+.. _GitHub Actions: https://docs.github.com/en/actions

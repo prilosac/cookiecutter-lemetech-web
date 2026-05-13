@@ -1,3 +1,14 @@
+{%- if cookiecutter.frontend_pipeline == 'Vite' %}
+from django.views.generic import RedirectView
+
+
+class UserRedirectView(RedirectView):
+    permanent = False
+    pattern_name = "home"
+
+
+user_redirect_view = UserRedirectView.as_view()
+{%- else %}
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -59,3 +70,4 @@ class UserRedirectView(LoginRequiredMixin, RedirectView):
 
 
 user_redirect_view = UserRedirectView.as_view()
+{%- endif %}

@@ -7,7 +7,9 @@ from django.db.models import CharField
 {%- if cookiecutter.username_type == "email" %}
 from django.db.models import EmailField
 {%- endif %}
+{%- if cookiecutter.frontend_pipeline != 'Vite' %}
 from django.urls import reverse
+{%- endif %}
 from django.utils.translation import gettext_lazy as _
 {%- if cookiecutter.username_type == "email" %}
 
@@ -43,8 +45,12 @@ class User(AbstractUser):
             str: URL for user detail.
 
         """
+        {%- if cookiecutter.frontend_pipeline == 'Vite' %}
+        return "/"
+        {%- else %}
         {%- if cookiecutter.username_type == "email" %}
         return reverse("users:detail", kwargs={"pk": self.id})
         {%- else %}
         return reverse("users:detail", kwargs={"username": self.username})
+        {%- endif %}
         {%- endif %}

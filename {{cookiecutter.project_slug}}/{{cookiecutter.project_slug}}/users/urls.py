@@ -1,3 +1,12 @@
+{%- if cookiecutter.frontend_pipeline == 'Vite' %}
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from django.urls import URLPattern
+
+app_name = "users"
+urlpatterns: list[URLPattern] = []
+{%- else %}
 from django.urls import path
 
 from .views import user_detail_view
@@ -14,3 +23,4 @@ urlpatterns = [
     path("<str:username>/", view=user_detail_view, name="detail"),
     {%- endif %}
 ]
+{%- endif %}

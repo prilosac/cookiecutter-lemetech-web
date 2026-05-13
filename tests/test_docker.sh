@@ -1,5 +1,5 @@
 #!/bin/sh
-# this is a very simple script that tests the docker configuration for cookiecutter-django
+# this is a very simple script that tests the docker configuration for cookiecutter-lemetech-web
 # it is meant to be run from the root directory of the repository, eg:
 # sh tests/test_docker.sh
 
@@ -10,7 +10,7 @@ set -e
 finish() {
   # Your cleanup code here
   docker compose -f docker-compose.local.yml down --remove-orphans
-  docker volume rm my_awesome_project_my_awesome_project_local_postgres_data
+  docker volume rm leme_tech_project_leme_tech_project_local_postgres_data
 
 }
 # the cleanup doesn't work in the github actions
@@ -23,11 +23,11 @@ fi
 mkdir -p .cache/docker
 cd .cache/docker
 
-sudo rm -rf my_awesome_project
+sudo rm -rf leme_tech_project
 
 # create the project using the default settings in cookiecutter.json
 uv run cookiecutter ../../ --no-input --overwrite-if-exists use_docker=y "$@"
-cd my_awesome_project
+cd leme_tech_project
 
 # make sure all images build
 docker compose -f docker-compose.local.yml build
@@ -37,7 +37,7 @@ docker compose -f docker-compose.local.yml run django uv lock
 docker compose -f docker-compose.local.yml build
 
 # run the project's type checks
-docker compose -f docker-compose.local.yml run --rm django mypy my_awesome_project
+docker compose -f docker-compose.local.yml run --rm django mypy leme_tech_project
 
 # run the project's tests
 docker compose -f docker-compose.local.yml run --rm django pytest
@@ -58,6 +58,7 @@ docker compose -f docker-compose.local.yml run --rm \
   -e DJANGO_ADMIN_URL=x \
   -e MAILGUN_API_KEY=x \
   -e MAILGUN_DOMAIN=x \
+  -e SENTRY_DSN=https://examplePublicKey@o0.ingest.sentry.io/0 \
   django python manage.py check --settings=config.settings.production --deploy --database default --fail-level WARNING
 
 # Generate the HTML for the documentation
@@ -68,7 +69,7 @@ docker build -f ./compose/production/django/Dockerfile -t django-prod .
 docker run --rm \
 --env-file .envs/.local/.django \
 --env-file .envs/.local/.postgres \
---network my_awesome_project_default \
+--network leme_tech_project_default \
 -e DJANGO_SECRET_KEY="$(openssl rand -base64 64)" \
 -e REDIS_URL=redis://redis:6379/0 \
 -e DJANGO_AWS_ACCESS_KEY_ID=x \
@@ -77,10 +78,14 @@ docker run --rm \
 -e DJANGO_ADMIN_URL=x \
 -e MAILGUN_API_KEY=x \
 -e MAILGUN_DOMAIN=x \
+-e SENTRY_DSN=https://examplePublicKey@o0.ingest.sentry.io/0 \
 django-prod python manage.py check --settings=config.settings.production --deploy --database default --fail-level WARNING
 
-# Run npm build script if package.json is present
-if [ -f "package.json" ]
+# Run npm build script if frontend/package.json or package.json is present
+if [ -f "frontend/package.json" ]
+then
+    docker compose -f docker-compose.local.yml run --rm node npm run build
+elif [ -f "package.json" ]
 then
     docker compose -f docker-compose.local.yml run --rm node npm run build
 fi

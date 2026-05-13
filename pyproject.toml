@@ -1,5 +1,5 @@
 [project]
-name = "cookiecutter-django"
+name = "cookiecutter-lemetech-web"
 version = "2026.04.03"
 description = "A Cookiecutter template for creating production-ready Django projects quickly."
 readme = "README.md"
@@ -12,7 +12,7 @@ keywords = [
 ]
 license = { text = "BSD" }
 authors = [
-  { name = "Daniel Roy Greenfeld", email = "pydanny@gmail.com" },
+  { name = "Lucas Teixeira", email = "prilosac@gmail.com" },
 ]
 requires-python = "==3.14.*"
 classifiers = [
@@ -48,7 +48,7 @@ dependencies = [
   "tox==4.52.0",
   "tox-uv>=1.17",
 ]
-urls = { Repository = "https://github.com/cookiecutter/cookiecutter-django" }
+urls = { Repository = "https://github.com/prilosac/cookiecutter-lemetech-web" }
 
 [dependency-groups]
 docs = [
@@ -59,7 +59,7 @@ docs = [
 ]
 
 [tool.ruff]
-target-version = "py39"
+target-version = "py314"
 line-length = 119
 # Exclude the template content as most files aren't parseable
 extend-exclude = [
@@ -119,6 +119,7 @@ lint.select = [
   "YTT",
 ]
 lint.ignore = [
+  "COM812", # Let the formatter handle trailing commas, not the linter
   "EM101",
   "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar`
   "S101",   # Use of assert detected https://docs.astral.sh/ruff/rules/assert/
@@ -133,7 +134,7 @@ keep_full_version = true
 # ==== pytest ====
 [tool.pytest]
 minversion = "9.0"
-addopts = [ "-v", "--tb=short" ]
+addopts = [ "-v", "--tb=short", "--basetemp=.pytest-tmp" ]
 norecursedirs = [
   ".tox",
   ".git",

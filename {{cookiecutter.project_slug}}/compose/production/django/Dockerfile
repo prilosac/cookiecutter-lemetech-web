@@ -22,6 +22,17 @@ ENV DJANGO_AZURE_ACCOUNT_NAME=${DJANGO_AZURE_ACCOUNT_NAME}
 {%- endif %}
 {%- endif %}
 RUN npm run build
+{% elif cookiecutter.frontend_pipeline == 'Vite' -%}
+FROM docker.io/node:24.14-bookworm-slim AS client-builder
+
+ARG APP_HOME=/app
+WORKDIR ${APP_HOME}/frontend
+
+COPY ./frontend/package.json ${APP_HOME}/frontend
+COPY ./frontend/src/routes ${APP_HOME}/frontend/src/routes
+RUN npm install && npm cache clean --force
+COPY ./frontend ${APP_HOME}/frontend
+RUN npm run build
 {%- endif %}
 # define an alias for the specific python version used in this file.
 FROM ghcr.io/astral-sh/uv:python3.14-bookworm-slim AS python-build-stage
@@ -47,6 +58,9 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --locked --no-install-project --no-dev
 {%- if cookiecutter.frontend_pipeline in ['Gulp', 'Webpack'] %}
 COPY --from=client-builder ${APP_HOME} ${APP_HOME}
+{%- elif cookiecutter.frontend_pipeline == 'Vite' %}
+COPY . ${APP_HOME}
+COPY --from=client-builder ${APP_HOME}/frontend/dist ${APP_HOME}/frontend/dist
 {% else %}
 COPY . ${APP_HOME}
 {%- endif %}
