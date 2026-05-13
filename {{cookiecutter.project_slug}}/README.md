@@ -2,7 +2,7 @@
 
 {{ cookiecutter.description }}
 
-[![Built with Cookiecutter Leme Tech Web](https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg?logo=cookiecutter)](https://github.com/cookiecutter/cookiecutter-django/)
+[![Built with Cookiecutter Leme Tech Web](https://img.shields.io/badge/built%20with-Cookiecutter%20Leme%20Tech%20Web-ff69b4.svg?logo=cookiecutter)](https://github.com/prilosac/cookiecutter-lemetech-web/)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
 {%- if cookiecutter.open_source_license != "Not open source" %}
