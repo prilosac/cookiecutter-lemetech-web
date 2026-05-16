@@ -44,7 +44,7 @@ _These features can be enabled during initial project setup._
 ## Constraints
 
 - Only maintained 3rd party libraries are used.
-- Uses PostgreSQL everywhere: 14 - 18 ([MySQL fork](https://github.com/mabdullahadeel/cookiecutter-django-mysql) also available).
+- Uses PostgreSQL everywhere: 14 - 18 (There's no MySQL fork of this cookiecutter at this time, PR welcome!)
 - Environment variables for configuration (This won't work with Apache/mod_wsgi).
 
 ## Usage
@@ -58,13 +58,13 @@ First, get Cookiecutter. Trust me, it's awesome:
 
 Now run it against this repo:
 
-    uvx cookiecutter https://github.com/cookiecutter/cookiecutter-django
+    uvx cookiecutter https://github.com/prilosac/cookiecutter-lemetech-web
 
 You'll be prompted for some values. Provide them, then a Django project will be created for you.
 
 **Warning**: After this point, change 'Lucas Teixeira', 'prilosac', etc to your own information.
 
-Answer the prompts with your own desired [options](http://cookiecutter-django.readthedocs.io/en/latest/1-getting-started/project-generation-options.html). For example:
+Answer the prompts with your own desired options, many of which are inherited from the [original cookiecutter-django template](http://cookiecutter-django.readthedocs.io/en/latest/1-getting-started/project-generation-options.html). For example:
 
     Cloning into 'cookiecutter-lemetech-web'...
     remote: Counting objects: 550, done.
@@ -175,11 +175,6 @@ For local development, see the following. I strongly recommend you use docker, a
 
 Scattered throughout the Python and HTML of this project are places marked with "your stuff". This is where third-party libraries are to be integrated with your project.
 
-## For MySQL users
-
-To get full MySQL support in addition to the default Postgresql, you can use this fork of the cookiecutter-django:
-https://github.com/mabdullahadeel/cookiecutter-django-mysql
-
 ## Releases
 
 Need a stable release? You can find them at <https://github.com/prilosac/cookiecutter-lemetech-web/releases>
@@ -195,22 +190,3 @@ If you have differences in your preferred setup, I encourage you to fork this to
 ### Submit a Pull Request
 
 I'll accept pull requests at my discretion. PRs are welcome, and time is scarce.
-
-## Articles
-
-- [Why cookiecutter-django is Essential for Your Next Django Project](https://medium.com/@millsks/why-cookiecutter-django-is-essential-for-your-next-django-project-7d3c00cdce51) - Aug. 4, 2024
-- [How to Make Your Own Django Cookiecutter Template!](https://medium.com/@FatemeFouladkar/how-to-make-your-own-django-cookiecutter-template-a753d4cbb8c2) - Aug. 10, 2023
-- [Cookiecutter Django With Amazon RDS](https://haseeburrehman.com/posts/cookiecutter-django-with-amazon-rds/) - Apr, 2, 2021
-- [Complete Walkthrough: Blue/Green Deployment to AWS ECS using GitHub actions](https://github.com/Andrew-Chen-Wang/cookiecutter-django-ecs-github) - June 10, 2020
-- [Using cookiecutter-django with Google Cloud Storage](https://ahhda.github.io/cloud/gce/django/2019/03/12/using-django-cookiecutter-cloud-storage.html) - Mar. 12, 2019
-- [cookiecutter-django with Nginx, Route 53 and ELB](https://msaizar.com/blog/cookiecutter-django-nginx-route-53-and-elb/) - Feb. 12, 2018
-- [cookiecutter-django and Amazon RDS](https://msaizar.com/blog/cookiecutter-django-and-amazon-rds/) - Feb. 7, 2018
-- [Using Cookiecutter to Jumpstart a Django Project on Windows with PyCharm](https://joshuahunter.com/posts/using-cookiecutter-to-jumpstart-a-django-project-on-windows-with-pycharm/) - May 19, 2017
-- [Exploring with Cookiecutter](http://www.snowboardingcoder.com/django/2016/12/03/exploring-with-cookiecutter/) - Dec. 3, 2016
-- [Introduction to Cookiecutter-Django](http://krzysztofzuraw.com/blog/2016/django-cookiecutter.html) - Feb. 19, 2016
-- [Django and GitLab - Running Continuous Integration and tests with your FREE account](http://dezoito.github.io/2016/05/11/django-gitlab-continuous-integration-phantomjs.html) - May. 11, 2016
-- [Development and Deployment of Cookiecutter-Django on Fedora](https://realpython.com/blog/python/development-and-deployment-of-cookiecutter-django-on-fedora/) - Jan. 18, 2016
-- [Development and Deployment of Cookiecutter-Django via Docker](https://realpython.com/blog/python/development-and-deployment-of-cookiecutter-django-via-docker/) - Dec. 29, 2015
-- [How to create a Django Application using Cookiecutter and Django 1.8](https://www.swapps.io/blog/how-to-create-a-django-application-using-cookiecutter-and-django-1-8/) - Sept. 12, 2015
-
-Have a blog or online publication? Write about your cookiecutter-django tips and tricks, then send us a pull request with the link.
