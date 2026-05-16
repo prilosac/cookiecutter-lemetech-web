@@ -64,7 +64,7 @@ You'll be prompted for some values. Provide them, then a Django project will be 
 
 **Warning**: After this point, change 'Lucas Teixeira', 'prilosac', etc to your own information.
 
-Answer the prompts with your own desired options, many of which are inherited from the [original cookiecutter-django template](http://cookiecutter-django.readthedocs.io/en/latest/1-getting-started/project-generation-options.html). For example:
+Answer the prompts with your own desired options, many of which are inherited from the [original cookiecutter-django template](https://cookiecutter-django.readthedocs.io/en/latest/1-getting-started/project-generation-options.html). For example:
 
     Cloning into 'cookiecutter-lemetech-web'...
     remote: Counting objects: 550, done.
