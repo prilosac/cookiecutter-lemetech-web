@@ -46,7 +46,7 @@ dependencies = [
   "ruff==0.15.9",
   "sh==2.2.2; sys_platform!='win23'",
   "tox==4.54.0",
-  "tox-uv>=1.17",
+  "tox-uv>=1.35.2",
 ]
 urls = { Repository = "https://github.com/prilosac/cookiecutter-lemetech-web" }
 
