@@ -1,5 +1,5 @@
 {% if cookiecutter.frontend_pipeline in ['Gulp', 'Webpack'] -%}
-FROM docker.io/node:26.1-bookworm-slim AS client-builder
+FROM docker.io/node:26.3-bookworm-slim AS client-builder
 
 ARG APP_HOME=/app
 WORKDIR ${APP_HOME}
@@ -23,7 +23,7 @@ ENV DJANGO_AZURE_ACCOUNT_NAME=${DJANGO_AZURE_ACCOUNT_NAME}
 {%- endif %}
 RUN npm run build
 {% elif cookiecutter.frontend_pipeline == 'Vite' -%}
-FROM docker.io/node:26.1-bookworm-slim AS client-builder
+FROM docker.io/node:26.3-bookworm-slim AS client-builder
 
 ARG APP_HOME=/app
 WORKDIR ${APP_HOME}/frontend
