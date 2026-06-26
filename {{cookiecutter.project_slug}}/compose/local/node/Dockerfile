@@ -1,4 +1,4 @@
-FROM docker.io/node:26.3-bookworm-slim
+FROM docker.io/node:26.4-bookworm-slim
 
 {% if cookiecutter.frontend_pipeline == 'Vite' -%}
 WORKDIR /app/frontend
